@@ -8,18 +8,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-enum Status{
-    DELIVERED,
-    READ,
-    UNREAD
-}
-
-enum NotificationType{
-    ALERT,
-    REMINDER,
-    OTP
-}
-
 @Entity
 @Table(name = "notifications")
 public class Notification extends BaseEntity {
@@ -35,7 +23,7 @@ public class Notification extends BaseEntity {
     @Column(name = "status")
     @NotNull(message = "Status cannot be null")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private NotificationStatus notificationStatus;
 
     @Column(name = "type")
     @NotNull(message = "Notification type cannot be null")
@@ -58,12 +46,12 @@ public class Notification extends BaseEntity {
         this.date = date;
     }
 
-    public Status getStatus() {
-        return status;
+    public NotificationStatus getNotificationStatus() {
+        return notificationStatus;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setNotificationStatus(NotificationStatus notificationStatus) {
+        this.notificationStatus = notificationStatus;
     }
 
     public NotificationType getNotificationType() {

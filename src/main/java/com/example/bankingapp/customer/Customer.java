@@ -47,6 +47,7 @@ public class Customer extends Person {
 
     public void addAccount(Account account){
         accounts.add(account);
+        account.setCustomer(this);
     }
 
     public void addNotification(Notification notification){
