@@ -6,8 +6,10 @@ import com.example.bankingapp.entities.BaseEntity;
 import com.example.bankingapp.loan.Loan;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -19,7 +21,8 @@ public class Transaction extends BaseEntity {
     private LocalDate dateOfTransaction;
 
     @Column(name = "amount", nullable = false)
-    private Long amount;
+    @NotNull(message = "Amount cannot be null")
+    private BigDecimal amount;
 
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
@@ -53,11 +56,11 @@ public class Transaction extends BaseEntity {
         this.dateOfTransaction = dateOfTransaction;
     }
 
-    public Long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Long amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -99,5 +102,35 @@ public class Transaction extends BaseEntity {
 
     public void setHandledBy(Employee handledBy) {
         this.handledBy = handledBy;
+    }
+
+    public boolean isDebit(){
+        if(this.getTransactionType() == TransactionType.WITHDRAWAL ||
+                getTransactionType() == TransactionType.CHARGE ||
+                getTransactionType() == TransactionType.LOAN_REPAYMENT){
+            return this.getTransactionStatus() == TransactionStatus.SUCCESS;
+        }
+        return false;
+    }
+
+    public boolean isCredit(){
+        if(getTransactionType() == TransactionType.DEPOSIT ||
+                getTransactionType() == TransactionType.INTEREST ||
+                getTransactionType() == TransactionType.LOAN_DISBURSEMENT){
+            return this.getTransactionStatus() == TransactionStatus.SUCCESS;
+        }
+        return false;
+    }
+    
+    @Override
+    public String toString(){
+        return new ToStringCreator(this)
+                .append("id : ", getId())
+                .append("date : ", getDateOfTransaction())
+                .append("amount : ", getAmount())
+                .append("type : ", getTransactionType())
+                .append("status : ", getTransactionStatus())
+                .append("handled by : ", getHandledBy().getName())
+                .toString();
     }
 }

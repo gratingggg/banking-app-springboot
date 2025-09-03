@@ -4,6 +4,7 @@ import com.example.bankingapp.entities.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -60,5 +61,28 @@ public class Notification extends BaseEntity {
 
     public void setNotificationType(NotificationType notificationType) {
         this.notificationType = notificationType;
+    }
+
+    public void markAsRead(){
+        notificationStatus = NotificationStatus.READ;
+    }
+
+    public void markAsUnread(){
+        notificationStatus = NotificationStatus.UNREAD;
+    }
+
+    public boolean isUnread(){
+        return notificationStatus == NotificationStatus.UNREAD;
+    }
+
+    @Override
+    public String toString(){
+        return new ToStringCreator(this)
+                .append("id : ", this.getId())
+                .append("message : ", getMessage())
+                .append("type : ", getNotificationType())
+                .append("status : ", getNotificationStatus())
+                .append("date : ", getDate())
+                .toString();
     }
 }

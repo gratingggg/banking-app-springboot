@@ -1,6 +1,7 @@
 package com.example.bankingapp.customer;
 
 import com.example.bankingapp.account.Account;
+import com.example.bankingapp.account.AccountStatus;
 import com.example.bankingapp.entities.Person;
 import com.example.bankingapp.notification.Notification;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.core.style.ToStringCreator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -62,6 +64,19 @@ public class Customer extends Person {
         }
 
         return null;
+    }
+
+    public synchronized void removeAccount(Account account){
+        if(account != null){
+            if(account.getBalance().compareTo(BigDecimal.ZERO) == 0){
+                accounts.remove(account);
+                account.setCustomer(null);
+                account.setAccountStatus(AccountStatus.CLOSED);
+                return;
+            }
+            throw new IllegalStateException("Your account has some remaining balance.");
+        }
+        throw new IllegalArgumentException("Account cannot be null");
     }
 
     @Override

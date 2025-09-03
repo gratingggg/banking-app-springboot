@@ -6,8 +6,10 @@ import com.example.bankingapp.loan.Loan;
 import com.example.bankingapp.transaction.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -29,7 +31,7 @@ public class Account extends BaseEntity {
 
     @Column(name = "balance",nullable = false)
     @NotNull(message = "Balance cannot be null")
-    private Long balance = 0L;
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Column(name = "date",nullable = false)
     @NotNull(message = "Date of issuance cannot be null")
@@ -59,15 +61,15 @@ public class Account extends BaseEntity {
         return accountStatus;
     }
 
-    public void setStatus(AccountStatus accountStatus) {
+    public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
 
-    public Long getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Long balance) {
+    public synchronized void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 
@@ -100,8 +102,56 @@ public class Account extends BaseEntity {
         loan.setAccount(this);;
     }
 
-    public void addTransaction(Transaction transaction){
+    public synchronized void addTransaction(Transaction transaction){
         transactions.add(transaction);
         transaction.setAccount(this);
+    }
+
+    public synchronized BigDecimal deposit(BigDecimal depositFund){
+        if(depositFund != null){
+            if(depositFund.compareTo(BigDecimal.ZERO) > 0){
+                balance = balance.add(depositFund);
+                return balance;
+            }
+            throw new IllegalArgumentException("Deposit amount cannot be zero or negative.");
+        }
+        throw new IllegalArgumentException("Deposit cannot be null.");
+    }
+
+    public synchronized BigDecimal withdrawal(BigDecimal withdrawalAmount){
+        if(withdrawalAmount != null){
+            if(withdrawalAmount.compareTo(BigDecimal.ZERO) > 0){
+                if (balance.compareTo(withdrawalAmount) < 0) {
+                    throw new IllegalArgumentException("Insufficient balance.");
+                }
+                balance = balance.subtract(withdrawalAmount);
+                return balance;
+            }
+            throw new IllegalArgumentException("Withdrawal amount cannot be zero or negative.");
+        }
+        throw new IllegalArgumentException("Withdrawal amount cannot be null.");
+    }
+
+    public synchronized BigDecimal transferTo(Account account, BigDecimal amount){
+        if(account != null){
+            if(account.getAccountStatus() == AccountStatus.ACTIVE){
+                this.withdrawal(amount);
+                account.deposit(amount);
+                return this.balance;
+            }
+            throw new IllegalArgumentException("The account is not active.");
+        }
+        throw new IllegalArgumentException("Account cannot be null.");
+    }
+
+    @Override
+    public String toString(){
+        return new ToStringCreator(this)
+                .append("id : ", getId())
+                .append("type : ", getAccountType())
+                .append("status : ", getAccountStatus())
+                .append("balance", getBalance())
+                .append("issuance date : " , getDateOfIssuance())
+                .toString();
     }
 }

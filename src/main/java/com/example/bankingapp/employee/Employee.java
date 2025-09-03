@@ -6,6 +6,7 @@ import com.example.bankingapp.transaction.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.core.style.ToStringCreator;
 
 import java.util.*;
 
@@ -84,5 +85,20 @@ public class Employee extends Person {
     public void addHandledTransaction(Transaction transaction){
         handledTransactions.add(transaction);
         transaction.setHandledBy(this);
+    }
+
+    @Override
+    public String toString(){
+        return new ToStringCreator(this)
+                .append("id : ", this.getId())
+                .append("name : ", this.getName())
+                .append("phone number : ", this.getPhone_number())
+                .append("birth date : ", this.getDateOfBirth())
+                .append("address : ", this.getAddress())
+                .append("gender : ", this.getGender())
+                .append("username : ", this.getUsername())
+                .append("role : ", this.getEmployeeRole())
+                .append("status : ", this.getEmployeeStatus())
+                .toString();
     }
 }
