@@ -36,8 +36,8 @@ public class Person extends BaseEntity {
     private String address;
 
     @Column(name = "gender")
-    @NotBlank(message = "Gender cannot be blank")
-    private String gender;
+    @NotNull(message = "Gender cannot be null")
+    private PersonGender gender;
 
     @Column(name = "username", nullable = false)
     @NotBlank(message = "Username cannot be blank")
@@ -103,11 +103,11 @@ public class Person extends BaseEntity {
         this.address = address;
     }
 
-    public String getGender() {
+    public PersonGender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(PersonGender gender) {
         this.gender = gender;
     }
 }

@@ -3,10 +3,10 @@ package com.example.bankingapp.dto.customer;
 import jakarta.validation.constraints.NotBlank;
 
 public class CustomerLoginDTO {
-    @NotBlank(message = "Username cannot be blank")
+    @NotBlank(message = "Username cannot be blank.")
     private String username;
 
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank.")
     private String password;
 
     public String getUsername() {

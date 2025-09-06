@@ -1,5 +1,6 @@
 package com.example.bankingapp.dto.employee;
 
+import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.example.bankingapp.entities.employee.EmployeeRole;
 import com.example.bankingapp.entities.employee.EmployeeStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -22,7 +23,7 @@ public class EmployeeResponseDTO {
 
     private String address;
 
-    private String gender;
+    private PersonGender gender;
 
     private String username;
 
@@ -70,11 +71,11 @@ public class EmployeeResponseDTO {
         this.address = address;
     }
 
-    public String getGender() {
+    public PersonGender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(PersonGender gender) {
         this.gender = gender;
     }
 

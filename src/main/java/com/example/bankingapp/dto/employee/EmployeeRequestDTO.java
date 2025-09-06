@@ -1,5 +1,6 @@
 package com.example.bankingapp.dto.employee;
 
+import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.example.bankingapp.entities.employee.EmployeeRole;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
@@ -13,28 +14,28 @@ public class EmployeeRequestDTO {
     @NotBlank(message = "Name cannot be blank.")
     private String name;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email cannot be blank.")
+    @Email(message = "Invalid email format.")
     private String email;
 
-    @NotBlank(message = "Phone number cannot be blank")
-    @Pattern(regexp = "^\\d{10}$", message = "Invalid phone number")
+    @NotBlank(message = "Phone number must be exactly 10 digits.")
+    @Pattern(regexp = "^\\d{10}$")
     private String phoneNumber;
 
-    @NotNull(message = "Date of birth cannot be null")
+    @NotNull(message = "Date of birth cannot be null.")
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Address cannot be blank")
+    @NotBlank(message = "Address cannot be null.")
     private String address;
 
-    @NotBlank(message = "Gender cannot be blank")
-    private String gender;
+    @NotNull(message = "Gender cannot be blank.")
+    private PersonGender gender;
 
-    @NotBlank(message = "Username cannot be blank")
+    @NotBlank(message = "Username cannot be blank.")
     private String username;
 
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank.")
     private String password;
 
     @NotNull(message = "Employee role cannot be null.")
@@ -80,11 +81,11 @@ public class EmployeeRequestDTO {
         this.address = address;
     }
 
-    public String getGender() {
+    public PersonGender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(PersonGender gender) {
         this.gender = gender;
     }
 

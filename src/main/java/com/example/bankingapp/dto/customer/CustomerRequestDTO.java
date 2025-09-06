@@ -1,10 +1,8 @@
 package com.example.bankingapp.dto.customer;
 
+import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -12,32 +10,31 @@ public class CustomerRequestDTO {
     @NotBlank(message = "Name cannot be blank.")
     private String name;
 
-    @NotBlank(message = "Email cannot be blank")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email cannot be blank.")
+    @Email(message = "Invalid email format.")
     private String email;
 
-    @NotBlank(message = "Phone number cannot be blank")
-    @Pattern(regexp = "^\\d{10}$", message = "Invalid phone number")
+    @Pattern(regexp = "^\\d{10}$", message = "Phone number must be exactly 10 digits.")
     private String phoneNumber;
 
-    @NotNull(message = "Date of birth cannot be null")
+    @NotNull(message = "Date of birth cannot be null.")
     @JsonFormat(pattern = "dd-MM-yyyy")
+    @Past(message = "Invalid date. Please enter a valid date.")
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Address cannot be blank")
+    @NotBlank(message = "Address cannot be blank.")
     private String address;
 
-    @NotBlank(message = "Gender cannot be blank")
-    private String gender;
+    @NotNull(message = "Gender cannot be null.")
+    private PersonGender gender;
 
-    @NotBlank(message = "Username cannot be blank")
+    @NotBlank(message = "Username cannot be blank.")
     private String username;
 
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "Password cannot be blank.")
     private String password;
 
-    @NotBlank(message = "Aadhar no cannot be blank")
-    @Pattern(regexp = "^\\d{12}$")
+    @Pattern(regexp = "^\\d{12}$", message = "Aadhar number must be exactly 12 digits.")
     private String aadharNo;
 
     public String getName() {
@@ -80,11 +77,11 @@ public class CustomerRequestDTO {
         this.address = address;
     }
 
-    public String getGender() {
+    public PersonGender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(PersonGender gender) {
         this.gender = gender;
     }
 

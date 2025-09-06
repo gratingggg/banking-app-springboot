@@ -1,5 +1,6 @@
 package com.example.bankingapp.dto.customer;
 
+import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -20,7 +21,7 @@ public class CustomerResponseDTO {
 
     private String address;
 
-    private String gender;
+    private PersonGender gender;
 
     private String username;
 
@@ -64,11 +65,11 @@ public class CustomerResponseDTO {
         this.address = address;
     }
 
-    public String getGender() {
+    public PersonGender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(PersonGender gender) {
         this.gender = gender;
     }
 

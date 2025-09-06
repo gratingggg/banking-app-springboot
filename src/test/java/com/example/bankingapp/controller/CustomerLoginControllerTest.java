@@ -1,0 +1,153 @@
+package com.example.bankingapp.controller;
+
+import com.example.bankingapp.dto.customer.CustomerLoginDTO;
+import com.example.bankingapp.entities.baseentities.PersonGender;
+import com.example.bankingapp.entities.customer.Customer;
+import com.example.bankingapp.repository.CustomerRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+
+import java.time.LocalDate;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class CustomerLoginControllerTest {
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
+    private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public CustomerLoginControllerTest(MockMvc mockMvc,
+                                       ObjectMapper objectMapper,
+                                       CustomerRepository customerRepository,
+                                       PasswordEncoder passwordEncoder){
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+        this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    private Customer createCustomer(int i){
+        Customer customer = new Customer();
+        customer.setName("Rudra " + i + " Ceaser");
+        customer.setUsername("rudra1" + i + "23");
+        customer.setPassword(passwordEncoder.encode("secret" + i));
+        customer.setEmail("ru" + i + "dra@example.com");
+        customer.setGender(PersonGender.MALE);
+        customer.setAddress("Mars" + i);
+        customer.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
+        customer.setAadharNo("1231231231" + i );
+        customer.setPhoneNumber("12341234" + i);
+
+        return customer;
+    }
+
+    private CustomerLoginDTO createCustomerLoginDTO(int i){
+        CustomerLoginDTO dto = new CustomerLoginDTO();
+        dto.setUsername("rudra1" + i + "23");
+        dto.setPassword("secret" + i);
+
+        return dto;
+    }
+
+    private ResultMatcher[] assertCustomerDTO(int i){
+        return new ResultMatcher[]{
+                jsonPath("$.name").value("Rudra " + i + " Ceaser"),
+                jsonPath("$.username").value("rudra1" + i + "23"),
+                jsonPath("$.email").value("ru" + i + "dra@example.com"),
+                jsonPath("$.gender").value("MALE"),
+                jsonPath("$.address").value("Mars" + i),
+                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + i)),
+                jsonPath("$.phoneNumber").value("12341234" + i)
+        };
+    }
+
+    @Test
+    public void WhenLoginCustomer_ThenOk() throws Exception{
+        Customer customer = createCustomer(23);
+        customerRepository.save(customer);
+        CustomerLoginDTO dto = createCustomerLoginDTO(23);
+        String requestBody = objectMapper.writeValueAsString(dto);
+        mockMvc
+                .perform(post("/home/customer/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpectAll(assertCustomerDTO(23));
+    }
+
+    @Test
+    public void WhenLoginWrongEmail_ThenUnauthorized() throws Exception{
+        Customer customer = createCustomer(24);
+        customerRepository.save(customer);
+        CustomerLoginDTO dto = createCustomerLoginDTO(24);
+        dto.setUsername("rudra123");
+        String requestBody = objectMapper.writeValueAsString(dto);
+        mockMvc
+                .perform(post("/home/customer/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("The customer with the username " + dto.getUsername() + " does not exist." +
+                        "Please enter the valid username."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @Test
+    public void WhenLoginWrongPassword_ThenUnauthorized() throws Exception{
+        Customer customer = createCustomer(25);
+        customerRepository.save(customer);
+        CustomerLoginDTO dto = createCustomerLoginDTO(25);
+        dto.setPassword("secret");
+        String requestBody = objectMapper.writeValueAsString(dto);
+        mockMvc
+                .perform(post("/home/customer/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Password do not match. Please enter the correct password."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @Test
+    public void WhenLoginMissingUsername_ThenBadRequest() throws Exception{
+        Customer customer = createCustomer(26);
+        customerRepository.save(customer);
+        CustomerLoginDTO dto = createCustomerLoginDTO(26);
+        dto.setUsername("");
+        String requestBody = objectMapper.writeValueAsString(dto);
+        mockMvc
+                .perform(post("/home/customer/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.username").value("Username cannot be blank."));
+    }
+
+    @Test
+    public void WhenLoginMissingPassword_ThenBadRequest() throws Exception{
+        Customer customer = createCustomer(27);
+        customerRepository.save(customer);
+        CustomerLoginDTO dto = createCustomerLoginDTO(27);
+        dto.setPassword("");
+        String requestBody = objectMapper.writeValueAsString(dto);
+        mockMvc
+                .perform(post("/home/customer/login")
+                        .contentType("application/json")
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.password").value("Password cannot be blank."));
+    }
+}
