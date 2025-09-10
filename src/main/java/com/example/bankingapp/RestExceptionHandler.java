@@ -24,7 +24,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private ObjectMapper objectMapper;
 
     @ExceptionHandler({AadharNumberAlreadyExistsException.class, UsernameAlreadyExistsException.class,
-            EmailAlreadyExistsException.class, PhoneNumberAlreadyExistsException.class, })
+            EmailAlreadyExistsException.class, PhoneNumberAlreadyExistsException.class,
+            AccountDuplicationException.class})
     public ResponseEntity<Object> handleAlreadyExists(Exception ex){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value()));
@@ -35,6 +36,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED.value()));
+    }
+
+    @ExceptionHandler({CustomerNotFoundException.class, AccountNotFoundException.class,
+            EmployeeNotFoundException.class})
+    public ResponseEntity<Object> handleCustomerNotFound(Exception ex){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value()));
+    }
+
+    @ExceptionHandler({AccountAccessDeniedException.class})
+    public ResponseEntity<Object> handleAccountAccessDeniedException(Exception ex){
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN.value()));
+    }
+
+    @ExceptionHandler({AccountBalanceNotZeroException.class, AccountNotActiveException.class,
+            TransactionAmountInvalidException.class})
+    public ResponseEntity<Object> handleAccountBalanceNotZero(Exception ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }
 
     @Override

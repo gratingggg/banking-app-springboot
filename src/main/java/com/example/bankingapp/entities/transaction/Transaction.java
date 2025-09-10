@@ -48,6 +48,9 @@ public class Transaction extends BaseEntity {
     @NotNull(message = "Employee cannot be null")
     private Employee handledBy;
 
+    @Column(name = "failure_reasons", nullable = true)
+    private String failureReason;
+
     public LocalDate getDateOfTransaction() {
         return dateOfTransaction;
     }
@@ -121,7 +124,15 @@ public class Transaction extends BaseEntity {
         }
         return false;
     }
-    
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
+    }
+
     @Override
     public String toString(){
         return new ToStringCreator(this)

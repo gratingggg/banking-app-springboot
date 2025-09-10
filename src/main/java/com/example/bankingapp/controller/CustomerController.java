@@ -59,44 +59,10 @@ public class CustomerController {
         return fields;
     }
 
-    @GetMapping("/register")
-    public Map<String, Object> initCustomerRegistration(){
-        Map<String, Object> form = new LinkedHashMap<>();
-
-        form.put("Registration", "Customer");
-
-        List<Map<String, Object>> fields = personalRegisterListMaker();
-        form.put("fields", fields);
-
-        Map<String, String> actions = new LinkedHashMap<>();
-        actions.put("method", "POST");
-        actions.put("path", "/home/employee/register");
-        form.put("actions",actions);
-
-        return form;
-    }
-
     @PostMapping("/register")
     public ResponseEntity<CustomerResponseDTO> processCustomerRegistration(@Valid @RequestBody CustomerRequestDTO customerRequestDTO){
         CustomerResponseDTO customerResponseDTO = customerService.processCustomerRegistration(customerRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
-    }
-
-    @GetMapping("/login")
-    public Map<String, Object> initCustomerLogin(){
-        Map<String, Object> form = new LinkedHashMap<>();
-
-        form.put("Login", "Customer");
-
-        List<Map<String, Object>> fields = getMaps();
-        form.put("fields", fields);
-
-        Map<String, String> actions = new LinkedHashMap<>();
-        actions.put("method", "POST");
-        actions.put("path", "/home/customer/login");
-        form.put("actions", actions);
-
-        return form;
     }
 
     @PostMapping("/login")

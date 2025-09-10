@@ -1,5 +1,7 @@
 package com.example.bankingapp.dto.transaction;
 
+import com.example.bankingapp.entities.transaction.TransactionStatus;
+import com.example.bankingapp.entities.transaction.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
@@ -16,6 +18,12 @@ public class TransactionResponseDTO {
     private Long loanId;
 
     private Long transactionId;
+
+    private TransactionStatus transactionStatus;
+
+    private TransactionType transactionType;
+
+    private String failureReason;
 
     public LocalDate getDateOfTransaction() {
         return dateOfTransaction;
@@ -55,5 +63,29 @@ public class TransactionResponseDTO {
 
     public void setTransactionId(Long transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public TransactionStatus getTransactionStatus() {
+        return transactionStatus;
+    }
+
+    public void setTransactionStatus(TransactionStatus transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 }

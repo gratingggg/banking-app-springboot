@@ -1,5 +1,6 @@
 package com.example.bankingapp.entities.employee;
 
+import com.example.bankingapp.Role;
 import com.example.bankingapp.entities.baseentities.Person;
 import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.transaction.Transaction;
@@ -13,8 +14,8 @@ import java.util.Set;
 @Entity
 @Table(name = "employees")
 public class Employee extends Person {
-    @Column(name = "role", nullable = false)
-    @NotNull(message = "Role cannot be null")
+    @Column(name = "employee_role", nullable = false)
+    @NotNull(message = "Employee role cannot be null")
     @Enumerated(EnumType.STRING)
     private EmployeeRole employeeRole;
 
@@ -23,11 +24,23 @@ public class Employee extends Person {
     @Enumerated(EnumType.STRING)
     private EmployeeStatus employeeStatus;
 
+    @Column(name = "role", nullable = false)
+    @NotNull(message = "Role cannot be blank")
+    private Role role = Role.EMPLOYEE;
+
     @OneToMany(mappedBy = "approvedBy")
     private final Set<Loan> approvedLoans = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "handledBy")
     private final Set<Transaction> handledTransactions = new LinkedHashSet<>();
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public EmployeeRole getEmployeeRole() {
         return employeeRole;

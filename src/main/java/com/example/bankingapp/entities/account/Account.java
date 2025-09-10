@@ -1,9 +1,10 @@
 package com.example.bankingapp.entities.account;
 
-import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
+import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.transaction.Transaction;
+import com.example.bankingapp.exception.TransactionAmountInvalidException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
@@ -29,11 +30,11 @@ public class Account extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    @Column(name = "balance",nullable = false)
+    @Column(name = "balance", nullable = false)
     @NotNull(message = "Balance cannot be null")
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @Column(name = "date",nullable = false)
+    @Column(name = "date", nullable = false)
     @NotNull(message = "Date of issuance cannot be null")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfIssuance;
@@ -97,44 +98,32 @@ public class Account extends BaseEntity {
         return transactions;
     }
 
-    public void addLoan(Loan loan){
+    public void addLoan(Loan loan) {
         loans.add(loan);
-        loan.setAccount(this);;
+        loan.setAccount(this);
     }
 
-    public synchronized void addTransaction(Transaction transaction){
+    public synchronized void addTransaction(Transaction transaction) {
         transactions.add(transaction);
         transaction.setAccount(this);
     }
 
-    public synchronized BigDecimal deposit(BigDecimal depositFund){
-        if(depositFund != null){
-            if(depositFund.compareTo(BigDecimal.ZERO) > 0){
-                balance = balance.add(depositFund);
-                return balance;
-            }
-            throw new IllegalArgumentException("Deposit amount cannot be zero or negative.");
-        }
-        throw new IllegalArgumentException("Deposit cannot be null.");
+    public synchronized BigDecimal deposit(BigDecimal depositFund) {
+        balance = balance.add(depositFund);
+        return balance;
     }
 
-    public synchronized BigDecimal withdrawal(BigDecimal withdrawalAmount){
-        if(withdrawalAmount != null){
-            if(withdrawalAmount.compareTo(BigDecimal.ZERO) > 0){
-                if (balance.compareTo(withdrawalAmount) < 0) {
-                    throw new IllegalArgumentException("Insufficient balance.");
-                }
-                balance = balance.subtract(withdrawalAmount);
-                return balance;
-            }
-            throw new IllegalArgumentException("Withdrawal amount cannot be zero or negative.");
+    public synchronized BigDecimal withdrawal(BigDecimal withdrawalAmount) {
+        if(withdrawalAmount.compareTo(balance) > 0){
+            throw new TransactionAmountInvalidException("Withdrawal amount exceeds your account balance.");
         }
-        throw new IllegalArgumentException("Withdrawal amount cannot be null.");
+        balance = balance.subtract(withdrawalAmount);
+        return balance;
     }
 
-    public synchronized BigDecimal transferTo(Account account, BigDecimal amount){
-        if(account != null){
-            if(account.getAccountStatus() == AccountStatus.ACTIVE){
+    public synchronized BigDecimal transferTo(Account account, BigDecimal amount) {
+        if (account != null) {
+            if (account.getAccountStatus() == AccountStatus.ACTIVE) {
                 this.withdrawal(amount);
                 account.deposit(amount);
                 return this.balance;
@@ -145,13 +134,13 @@ public class Account extends BaseEntity {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return new ToStringCreator(this)
                 .append("id : ", getId())
                 .append("type : ", getAccountType())
                 .append("status : ", getAccountStatus())
                 .append("balance", getBalance())
-                .append("issuance date : " , getDateOfIssuance())
+                .append("issuance date : ", getDateOfIssuance())
                 .toString();
     }
 }

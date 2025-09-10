@@ -1,11 +1,14 @@
 package com.example.bankingapp.entities.customer;
 
+import com.example.bankingapp.Role;
 import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.baseentities.Person;
 import com.example.bankingapp.entities.notification.Notification;
+import com.example.bankingapp.exception.AccountBalanceNotZeroException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.core.style.ToStringCreator;
 
@@ -31,6 +34,18 @@ public class Customer extends Person {
     @OrderBy("date")
     private final Set<Notification> notifications = new LinkedHashSet<>();
 
+    @Column(name = "role", nullable = false)
+    @NotNull(message = "Role cannot be blank")
+    private Role role = Role.CUSTOMER;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public String getAadharNo() {
         return aadharNo;
     }
@@ -47,40 +62,36 @@ public class Customer extends Person {
         return notifications;
     }
 
-    public void addAccount(Account account){
+    public void addAccount(Account account) {
         accounts.add(account);
         account.setCustomer(this);
     }
 
-    public void addNotification(Notification notification){
+    public void addNotification(Notification notification) {
         notifications.add(notification);
     }
 
-    public Account getAccount(Long accountId){
-        for(Account account : accounts){
-            if(account.getId().equals(accountId)){
+    public Account getAccount(Long accountId) {
+        for (Account account : accounts) {
+            if (account.getId().equals(accountId)) {
                 return account;
             }
         }
-
         return null;
     }
 
-    public synchronized void removeAccount(Account account){
-        if(account != null){
-            if(account.getBalance().compareTo(BigDecimal.ZERO) == 0){
-                accounts.remove(account);
-                account.setCustomer(null);
-                account.setAccountStatus(AccountStatus.CLOSED);
-                return;
-            }
-            throw new IllegalStateException("Your account has some remaining balance.");
+    public synchronized boolean removeAccount(Account account) {
+        if (account.getBalance().compareTo(BigDecimal.ZERO) == 0) {
+            accounts.remove(account);
+            account.setCustomer(null);
+            account.setAccountStatus(AccountStatus.CLOSED);
+            return true;
         }
-        throw new IllegalArgumentException("Account cannot be null");
+        throw new AccountBalanceNotZeroException();
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return new ToStringCreator(this)
                 .append("id : ", this.getId())
                 .append("name : ", this.getName())
