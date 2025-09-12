@@ -38,7 +38,7 @@ public class AccountController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/customer/accounts/{accountId}/transaction")
+    @GetMapping("/customer/accounts/{accountId}/transactions")
     public ResponseEntity<Page<TransactionResponseDTO>> getAllAccountTransaction(@PathVariable Long accountId, @RequestParam(defaultValue = "0", required = false) int page,
                                                                           @RequestParam(defaultValue = "10", required = false) int size, Principal principal){
         Page<TransactionResponseDTO> responseDTO = accountService.getAllAccountTransactions(accountId, page, size, principal.getName());

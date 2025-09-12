@@ -38,21 +38,21 @@ public class Loan extends BaseEntity {
     private LocalDate dateOfRepayment;
 
     @Column(name = "type", nullable = false)
-    @NotNull(message = "loan type cannot be null")
+    @NotNull(message = "loan type cannot be null.")
     @Enumerated(EnumType.STRING)
     private LoanType loanType;
 
     @Column(name = "status", nullable = false)
-    @NotNull(message = "Loan status cannot be null")
+    @NotNull(message = "Loan status cannot be null.")
     @Enumerated(EnumType.STRING)
     private LoanStatus loanStatus;
 
     @Column(name = "principal_amount", nullable = false)
-    @NotNull(message = "principal amount cannot be null")
+    @NotNull(message = "principal amount cannot be null.")
     private BigDecimal principalAmount;
 
     @Column(name = "interest_rate", nullable = false)
-    @NotNull(message = "interest rate cannot be null")
+    @NotNull(message = "interest rate cannot be null.")
     private BigDecimal rateOfInterest;
 
     @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY)
@@ -60,7 +60,7 @@ public class Loan extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
-    @NotNull(message = "Employee cannot be null")
+    @NotNull(message = "Employee cannot be null.")
     private Employee approvedBy;
 
     public Account getAccount() {
@@ -161,24 +161,26 @@ public class Loan extends BaseEntity {
     }
 
     public BigDecimal getOutstandingAmount(){
-        BigDecimal outstandingAmount = principalAmount;
-        LocalDate currentDate = LocalDate.now();
-        BigDecimal interest = BigDecimal.ZERO;
-        if(!isOverdue()){
-            long months = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
-            interest = (BigDecimal.valueOf(months)
-                    .divide(BigDecimal.valueOf(12), MathContext.DECIMAL128))
-                    .multiply(rateOfInterest)
-                    .multiply(principalAmount)
-                    .divide(BigDecimal.valueOf(100), MathContext.DECIMAL128);
+        long totalMonths = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
+
+        BigDecimal monthlyRate = rateOfInterest.divide(BigDecimal.valueOf(1200), MathContext.DECIMAL128);
+        BigDecimal outstanding = principalAmount.multiply(
+            monthlyRate.add(BigDecimal.ONE).pow((int) totalMonths, MathContext.DECIMAL128)
+        );
+
+        BigDecimal emi = calculateEMI();
+        if(isOverdue()){
+            BigDecimal penalty = emi.multiply(BigDecimal.valueOf(0.02));
+            outstanding = outstanding.add(penalty);
         }
-        outstandingAmount = outstandingAmount.add(interest);
-        for(Transaction transaction : transactions){
+
+        for (Transaction transaction : getTransactions()){
             if(transaction.isCredit()){
-                outstandingAmount = outstandingAmount.subtract(transaction.getAmount());
+                outstanding = outstanding.subtract(transaction.getAmount());
             }
         }
-        return outstandingAmount.setScale(2, RoundingMode.HALF_UP);
+
+        return outstanding;
     }
 
     public BigDecimal calculateEMI(){

@@ -4,8 +4,11 @@ import com.example.bankingapp.Role;
 import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.baseentities.Person;
+import com.example.bankingapp.entities.loan.Loan;
+import com.example.bankingapp.entities.loan.LoanStatus;
 import com.example.bankingapp.entities.notification.Notification;
 import com.example.bankingapp.exception.AccountBalanceNotZeroException;
+import com.example.bankingapp.exception.NonClosedLoanException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -81,9 +84,12 @@ public class Customer extends Person {
     }
 
     public synchronized boolean removeAccount(Account account) {
+        for(Loan loan : account.getLoans()){
+            if(!loan.getLoanStatus().equals(LoanStatus.CLOSED)){
+                throw new NonClosedLoanException();
+            }
+        }
         if (account.getBalance().compareTo(BigDecimal.ZERO) == 0) {
-            accounts.remove(account);
-            account.setCustomer(null);
             account.setAccountStatus(AccountStatus.CLOSED);
             return true;
         }

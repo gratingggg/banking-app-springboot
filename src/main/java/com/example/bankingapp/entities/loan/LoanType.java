@@ -5,6 +5,6 @@ public enum LoanType {
     PERSONAL,
     VEHICLE,
     EDUCATION,
-    BUSiNESS,
+    BUSINESS,
     GOLD
 }

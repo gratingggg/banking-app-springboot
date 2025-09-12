@@ -64,7 +64,7 @@ public class AccountService {
         dto.setTransactionId(transaction.getId());
         dto.setAmount(transaction.getAmount());
         dto.setDateOfTransaction(transaction.getDateOfTransaction());
-        dto.setLoanId(transaction.getLoan().getId());
+        if (transaction.getLoan() != null) dto.setLoanId(transaction.getLoan().getId());
         dto.setTransactionStatus(transaction.getTransactionStatus());
         dto.setTransactionType(transaction.getTransactionType());
         dto.setFailureReason(transaction.getFailureReason());
@@ -324,6 +324,4 @@ public class AccountService {
 
         return transactionToDto(transaction);
     }
-
-
 }
