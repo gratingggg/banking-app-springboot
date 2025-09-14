@@ -43,10 +43,10 @@ public class EmployeeLoginControllerTest {
 
     private Employee createEmployee(int i){
         Employee employee = new Employee();
-        employee.setName("Rudra " + i + " Ceaser");
-        employee.setUsername("rudra1" + i + "23");
+        employee.setName("Parth " + i + " William");
+        employee.setUsername("parth1" + i + "23");
         employee.setPassword(passwordEncoder.encode("secret" + i));
-        employee.setEmail("ru" + i + "dra@example.com");
+        employee.setEmail("pa" + i + "rth@example.com");
         employee.setGender(PersonGender.MALE);
         employee.setAddress("Mars" + i);
         employee.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
@@ -59,7 +59,7 @@ public class EmployeeLoginControllerTest {
 
     private EmployeeLoginDTO createEmployeeLoginDTO(int i){
         EmployeeLoginDTO dto = new EmployeeLoginDTO();
-        dto.setUsername("rudra1" + i + "23");
+        dto.setUsername("parth1" + i + "23");
         dto.setPassword("secret" + i);
 
         return dto;
@@ -67,9 +67,9 @@ public class EmployeeLoginControllerTest {
 
     private ResultMatcher[] assertEmployeeDTO(int i){
         return new ResultMatcher[]{
-                jsonPath("$.name").value("Rudra " + i + " Ceaser"),
-                jsonPath("$.username").value("rudra1" + i + "23"),
-                jsonPath("$.email").value("ru" + i + "dra@example.com"),
+                jsonPath("$.name").value("Parth " + i + " William"),
+                jsonPath("$.username").value("parth1" + i + "23"),
+                jsonPath("$.email").value("pa" + i + "rth@example.com"),
                 jsonPath("$.gender").value("MALE"),
                 jsonPath("$.address").value("Mars" + i),
                 jsonPath("$.dateOfBirth").value("01-01-" + (2000 + i)),

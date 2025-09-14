@@ -160,7 +160,7 @@ public class AccountService {
     public AccountResponseDTO getParticularCustomerAccount(Long accountId, String customerUsername){
         Customer customer = customerRepository.findByUsername(customerUsername).orElseThrow(CustomerNotFoundException::new);
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("The account with account id " + accountId + " does not exist."));
+                .orElseThrow(AccountNotFoundException::new);
         if(!account.getCustomer().getId().equals(customer.getId())){
             throw new AccountAccessDeniedException("You are not authorized to access this account.");
         }
@@ -170,7 +170,7 @@ public class AccountService {
     public Page<TransactionResponseDTO> getAllAccountTransactions(Long accountId, int page, int size, String customerUsername){
         Customer customer = customerRepository.findByUsername(customerUsername).orElseThrow(CustomerNotFoundException::new);
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("The account with account id " + accountId + " does not exist."));
+                .orElseThrow(AccountNotFoundException::new);
         if(!account.getCustomer().getId().equals(customer.getId())){
             throw new AccountAccessDeniedException("You are not authorized to access this account.");
         }
@@ -187,7 +187,7 @@ public class AccountService {
     public AccountResponseDTO deleteAccount(Long accountId, String customerUsername){
         Customer customer = customerRepository.findByUsername(customerUsername).orElseThrow(CustomerNotFoundException::new);
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("The account with account id " + accountId + " does not exist."));
+                .orElseThrow(AccountNotFoundException::new);
         if(!account.getCustomer().getId().equals(customer.getId())){
             throw new AccountAccessDeniedException("You are not authorized to access this account.");
         }
@@ -199,7 +199,7 @@ public class AccountService {
     public AccountBalanceResponseDTO getAccountBalance(Long accountId, String customerUsername){
         Customer customer = customerRepository.findByUsername(customerUsername).orElseThrow(CustomerNotFoundException::new);
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new AccountNotFoundException("The account with account id " + accountId + " does not exist."));
+                .orElseThrow(AccountNotFoundException::new);
         if(!account.getCustomer().getId().equals(customer.getId())){
             throw new AccountAccessDeniedException("You are not authorized to access this account.");
         }

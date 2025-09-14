@@ -91,10 +91,10 @@ public class CustomerAccountControllerTest {
 
     private Employee createEmployee(int i){
         Employee employee = new Employee();
-        employee.setName("Rudra " + i + " Ceaser");
-        employee.setUsername("rudra1" + i + "23");
+        employee.setName("Parth " + i + " William");
+        employee.setUsername("parth1" + i + "23");
         employee.setPassword(passwordEncoder.encode("secret" + i));
-        employee.setEmail("ru" + i + "dra@example.com");
+        employee.setEmail("pa" + i + "rth@example.com");
         employee.setGender(PersonGender.MALE);
         employee.setAddress("Mars" + i);
         employee.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
@@ -136,12 +136,12 @@ public class CustomerAccountControllerTest {
         accountRepository.saveAll(List.of(account0, account1));
 
         mockMvc.perform(get("/api/customer/accounts")
-                .with(user("rudra12823").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].accountId").exists())
-                .andExpect(jsonPath("$[0].accountType").value("CURRENT"))
+                .andExpect(jsonPath("$[0].accountType").value(account0.getAccountType().toString()))
                 .andExpect(jsonPath("$[1].accountId").exists())
-                .andExpect(jsonPath("$[1].accountType").value("SAVINGS"));
+                .andExpect(jsonPath("$[1].accountType").value(account1.getAccountType().toString()));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class CustomerAccountControllerTest {
         customerRepository.save(customer);
 
         mockMvc.perform(get("/api/customer/accounts")
-                .with(user("rudra12923").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
@@ -186,13 +186,13 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
-                .with(user("rudra13023").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
-                .andExpect(jsonPath("$.accountType").value("CURRENT"))
-                .andExpect(jsonPath("$.accountStatus").value("ACTIVE"))
+                .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
+                .andExpect(jsonPath("$.accountStatus").value(account.getAccountStatus().toString()))
                 .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-                .andExpect(jsonPath("$.balance").value("0.0"))
+                .andExpect(jsonPath("$.balance").value(0.0))
                 .andExpect(jsonPath("$.customerName").value(customer.getName()));
     }
 
@@ -203,24 +203,24 @@ public class CustomerAccountControllerTest {
 
         Long wrongAccountId = 123123123123L;
         mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}", wrongAccountId)
-                .with(user("rudra13123").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("The account with account id "+ wrongAccountId + " does not exist."));
+                .andExpect(jsonPath("$.message").value("Account not found."));
 
         mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/transactions", wrongAccountId)
-                        .with(user("rudra13123").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("The account with account id "+ wrongAccountId + " does not exist."));
+                .andExpect(jsonPath("$.message").value("Account not found."));
 
         mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/balance", wrongAccountId)
-                        .with(user("rudra13123").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("The account with account id "+ wrongAccountId + " does not exist."));
+                .andExpect(jsonPath("$.message").value("Account not found."));
 
         mockMvc.perform(post("/api/customer/accounts/{wrongAccountId}/close", wrongAccountId)
-                        .with(user("rudra13123").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("The account with account id "+ wrongAccountId + " does not exist."));
+                .andExpect(jsonPath("$.message").value("Account not found."));
 
     }
 
@@ -237,22 +237,22 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
-                .with(user("rudra13323").roles("CUSTOMER")))
+                .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
-                        .with(user("rudra13323").roles("CUSTOMER")))
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
-                        .with(user("rudra13323").roles("CUSTOMER")))
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
-                        .with(user("rudra13323").roles("CUSTOMER")))
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
     }
@@ -276,7 +276,7 @@ public class CustomerAccountControllerTest {
         transactionRepository.saveAll(List.of(transaction0, transaction1, transaction2));
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
-                .with(user("rudra13423").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
                 .andExpect(jsonPath("$.content[0].accountId").value(account.getId()))
@@ -296,7 +296,7 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
-                .with(user("rudra13523").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk());
     }
 
@@ -311,9 +311,9 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
-                .with(user("rudra13623").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value("2000.0"));
+                .andExpect(jsonPath("$.balance").value(2000.0));
     }
 
     @Test
@@ -325,13 +325,13 @@ public class CustomerAccountControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/api/customer/accounts")
-                        .with(user("rudra13723").roles("CUSTOMER"))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountId").exists())
                 .andExpect(jsonPath("$.customerName").value(customer.getName()))
-                .andExpect(jsonPath("$.accountType").value("CURRENT"))
+                .andExpect(jsonPath("$.accountType").value(requestDTO.getAccountType().toString()))
                 .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                 .andExpect(jsonPath("$.balance").value("0"))
                 .andExpect(jsonPath("$.accountStatus").value("ACTIVE"));
@@ -345,7 +345,7 @@ public class CustomerAccountControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/api/customer/accounts")
-                        .with(user("rudra13823").roles("CUSTOMER"))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest());
@@ -364,7 +364,7 @@ public class CustomerAccountControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/api/customer/accounts")
-                        .with(user("rudra13923").roles("CUSTOMER"))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isConflict())
@@ -382,12 +382,12 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
-                .with(user("rudra14023").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Your account is currently not active."));
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
-                        .with(user("rudra14023").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Your account is currently not active."));
     }
@@ -403,7 +403,7 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
-                        .with(user("rudra14123").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Account balance is not zero. Please withdraw the remaining money before deleting the account."));
 
@@ -419,7 +419,7 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
-                        .with(user("rudra14223").roles("CUSTOMER")))
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk());
 
         Account updatedAccount = accountRepository.findById(account.getId()).orElseThrow();
@@ -448,7 +448,7 @@ public class CustomerAccountControllerTest {
         accountRepository.save(account);
         loanRepository.save(loan);
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
-                .with(user("rudra14323").roles("CUSTOMER")))
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("You currently have active loan. Please clear them before deleting the account."));
     }
