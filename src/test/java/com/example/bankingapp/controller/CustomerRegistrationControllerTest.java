@@ -39,7 +39,9 @@ public class CustomerRegistrationControllerTest {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private CustomerRequestDTO createCustomerRequestDTO(int i){
+    private CustomerRequestDTO createCustomerRequestDTO(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         CustomerRequestDTO customer = new CustomerRequestDTO();
         customer.setName("Rudra " + i + " Ceaser");
         customer.setUsername("rudra1" + i + "23");
@@ -47,14 +49,16 @@ public class CustomerRegistrationControllerTest {
         customer.setEmail("ru" + i + "dra@example.com");
         customer.setGender(PersonGender.MALE);
         customer.setAddress("Mars" + i);
-        customer.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
-        customer.setAadharNo("1231231231" + i );
-        customer.setPhoneNumber("12341234" + i);
+        customer.setDateOfBirth(LocalDate.of(2000 + num, 1, 1));
+        customer.setAadharNo("123123123" + i );
+        customer.setPhoneNumber("1234123" + i);
 
         return customer;
     }
 
-    private Customer createCustomer(int i){
+    private Customer createCustomer(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         Customer customer = new Customer();
         customer.setName("Rudra " + i + " Ceaser");
         customer.setUsername("rudra1" + i + "23");
@@ -62,22 +66,24 @@ public class CustomerRegistrationControllerTest {
         customer.setEmail("ru" + i + "dra@example.com");
         customer.setGender(PersonGender.MALE);
         customer.setAddress("Mars" + i);
-        customer.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
-        customer.setAadharNo("1231231231" + i );
-        customer.setPhoneNumber("12341234" + i);
+        customer.setDateOfBirth(LocalDate.of(2000 + num, 1, 1));
+        customer.setAadharNo("123123123" + i );
+        customer.setPhoneNumber("1234123" + i);
 
         return customer;
     }
 
-    private ResultMatcher[] assertCustomerDTO(int i){
+    private ResultMatcher[] assertCustomerDTO(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         return new ResultMatcher[]{
                 jsonPath("$.name").value("Rudra " + i + " Ceaser"),
                 jsonPath("$.username").value("rudra1" + i + "23"),
                 jsonPath("$.email").value("ru" + i + "dra@example.com"),
                 jsonPath("$.gender").value("MALE"),
                 jsonPath("$.address").value("Mars" + i),
-                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + i)),
-                jsonPath("$.phoneNumber").value("12341234" + i)
+                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + num)),
+                jsonPath("$.phoneNumber").value("1234123" + i)
         };
     }
 

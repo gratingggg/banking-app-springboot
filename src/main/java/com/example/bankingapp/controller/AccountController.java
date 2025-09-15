@@ -94,7 +94,7 @@ public class AccountController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE'")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping("/employee/accounts/{accountId}/transactions")
     public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfAccountByEmployee(@PathVariable Long accountId,
                                                                                               @RequestParam(required = false, defaultValue = "0") int page,
@@ -104,7 +104,7 @@ public class AccountController {
         return ResponseEntity.ok(responseDTOS);
     }
 
-    @PreAuthorize("hasRole('EMPLOYEE'")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping("/employee/accounts/{accountId}/balance")
     public ResponseEntity<AccountBalanceResponseDTO> getAccountBalanceByEmployee(@PathVariable Long accountId, Principal principal){
         AccountBalanceResponseDTO responseDTO = accountService.getAccountBalanceByEmployee(accountId, principal.getName());
@@ -112,7 +112,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @PostMapping("/employee/customer/{customerId}/accounts/transactions")
+    @GetMapping("/employee/customer/{customerId}/accounts/transactions")
     public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfCustomer(@PathVariable Long customerId,
                                                                                      @RequestParam(required = false, defaultValue = "0") int page,
                                                                                      @RequestParam(required = false, defaultValue = "10") int size,
@@ -132,7 +132,7 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @PostMapping("/employee/account/{accountId}/withdrawl")
+    @PostMapping("/employee/accounts/{accountId}/withdrawal")
     public ResponseEntity<TransactionResponseDTO> withdrawFund(@PathVariable Long accountId,
                                                                @Valid @RequestParam(required = true) BigDecimal fund,
                                                                Principal principal){
@@ -140,4 +140,6 @@ public class AccountController {
         URI location = URI.create("/api/transaction/" + responseDTO.getTransactionId());
         return ResponseEntity.created(location).body(responseDTO);
     }
+
+
 }

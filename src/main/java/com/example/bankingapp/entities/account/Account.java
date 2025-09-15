@@ -3,7 +3,6 @@ package com.example.bankingapp.entities.account;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.loan.Loan;
-import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.exception.TransactionAmountInvalidException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -13,9 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "accounts")
@@ -46,9 +43,6 @@ public class Account extends BaseEntity {
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private final List<Loan> loans = new ArrayList<>();
-
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    private final Set<Transaction> transactions = new LinkedHashSet<>();
 
     public AccountType getAccountType() {
         return accountType;
@@ -94,18 +88,9 @@ public class Account extends BaseEntity {
         return loans;
     }
 
-    public Set<Transaction> getTransactions() {
-        return transactions;
-    }
-
     public void addLoan(Loan loan) {
         loans.add(loan);
         loan.setAccount(this);
-    }
-
-    public synchronized void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
-        transaction.setAccount(this);
     }
 
     public synchronized BigDecimal deposit(BigDecimal depositFund) {

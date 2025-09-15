@@ -10,6 +10,6 @@ public class EmployeeInactiveException extends RuntimeException {
     }
 
     public EmployeeInactiveException(){
-        super("Your account is invalid. Please contact the admin.");
+        super("Your status is currently not active. Please contact the admin.");
     }
 }

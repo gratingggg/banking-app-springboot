@@ -60,7 +60,8 @@ public class AccountService {
 
     private TransactionResponseDTO transactionToDto(Transaction transaction){
         TransactionResponseDTO dto = new TransactionResponseDTO();
-        dto.setAccountId(transaction.getAccount().getId());
+        if(transaction.getFromAccount() != null) dto.setFromAccountId(transaction.getFromAccount().getId());
+        if (transaction.getToAccount() != null) dto.setToAccountId(transaction.getToAccount().getId());
         dto.setTransactionId(transaction.getId());
         dto.setAmount(transaction.getAmount());
         dto.setDateOfTransaction(transaction.getDateOfTransaction());
@@ -117,9 +118,9 @@ public class AccountService {
         else throw new AccountNotActiveException();
     }
 
-    private Page<TransactionResponseDTO> getAllTransactions(Account account, int page, int size){
+    private Page<TransactionResponseDTO> getAllTransactions(Account fromAccount, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction"));
-        Page<Transaction> pageDto = transactionRepository.findByAccount(account, pageable);
+        Page<Transaction> pageDto = transactionRepository.findByAccount(fromAccount, pageable);
 
         return pageDto.map(this::transactionToDto);
     }
@@ -146,8 +147,7 @@ public class AccountService {
         Transaction transaction = new Transaction();
         transaction.setDateOfTransaction(LocalDate.now());
         transaction.setAmount(fund);
-        account.addTransaction(transaction);
-        transaction.setLoan(null);
+        transaction.setFromAccount(account);
         return transaction;
     }
 
@@ -247,9 +247,9 @@ public class AccountService {
 
     public Page<TransactionResponseDTO> getAllTransactionsOfCustomer(Long customerId, int page, int size, String employeeUsername){
         validateEmployeeFromUsername(employeeUsername);
-        customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
+        Customer customer = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction"));
-        Page<Transaction> transactions = transactionRepository.findByAccountCustomerId(customerId, pageable);
+        Page<Transaction> transactions = transactionRepository.findByCustomer(customer, pageable);
         return transactions.map(this::transactionToDto);
     }
 
@@ -261,10 +261,13 @@ public class AccountService {
 
         Transaction transaction = getTransaction(fund, account);
         transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setToAccount(account);
+        transaction.setFromAccount(null);
         employee.addHandledTransaction(transaction);
 
         BigDecimal sumAmount = fund;
-        for(Transaction tempTransaction : account.getTransactions()) {
+        List<Transaction> listOfTransaction = transactionRepository.findByAccount(account);
+        for(Transaction tempTransaction : listOfTransaction) {
             if(tempTransaction.getDateOfTransaction().equals(LocalDate.now())){
                 if (tempTransaction.isCredit() && tempTransaction.getTransactionStatus().equals(TransactionStatus.SUCCESS)) {
                     sumAmount = sumAmount.add(tempTransaction.getAmount());
@@ -300,7 +303,8 @@ public class AccountService {
         employee.addHandledTransaction(transaction);
 
         BigDecimal sumAmount = fund;
-        for(Transaction tempTransaction : account.getTransactions()) {
+        List<Transaction> listOfTransaction = transactionRepository.findByAccount(account);
+        for(Transaction tempTransaction : listOfTransaction) {
             if(tempTransaction.getDateOfTransaction().equals(LocalDate.now())){
                 if (tempTransaction.isDebit() && tempTransaction.getTransactionStatus().equals(TransactionStatus.SUCCESS)) {
                     sumAmount = sumAmount.add(tempTransaction.getAmount());

@@ -8,18 +8,20 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TransactionRequestDTO {
-    @NotNull(message = "Date of transaction cannot be null")
+    @NotNull(message = "Date of transaction cannot be null.")
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfTransaction;
 
-    @NotNull(message = "Amount cannot be null")
+    @NotNull(message = "Amount cannot be null.")
     private BigDecimal amount;
 
-    @NotNull(message = "Account id cannot be null")
-    private Long accountId;
+    private Long fromAccountId;
+
+    private Long toAccountId;
 
     private Long loanId;
 
+    @NotNull(message = "Transaction type cannot be null.")
     private TransactionType transactionType;
 
     public LocalDate getDateOfTransaction() {
@@ -38,12 +40,12 @@ public class TransactionRequestDTO {
         this.amount = amount;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getFromAccountId() {
+        return fromAccountId;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setFromAccountId(Long fromAccountId) {
+        this.fromAccountId = fromAccountId;
     }
 
     public Long getLoanId() {
@@ -60,5 +62,13 @@ public class TransactionRequestDTO {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
+    }
+
+    public Long getToAccountId() {
+        return toAccountId;
+    }
+
+    public void setToAccountId(Long toAccountId) {
+        this.toAccountId = toAccountId;
     }
 }

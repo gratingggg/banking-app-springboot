@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -67,7 +68,9 @@ public class CustomerAccountControllerTest {
         this.objectMapper = objectMapper;
     }
 
-    private Customer createCustomer(int i){
+    private Customer createCustomer(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         Customer customer = new Customer();
         customer.setName("Rudra " + i + " Ceaser");
         customer.setUsername("rudra1" + i + "23");
@@ -75,9 +78,9 @@ public class CustomerAccountControllerTest {
         customer.setEmail("ru" + i + "dra@example.com");
         customer.setGender(PersonGender.MALE);
         customer.setAddress("Mars" + i);
-        customer.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
-        customer.setAadharNo("1231231231" + i );
-        customer.setPhoneNumber("12341234" + i);
+        customer.setDateOfBirth(LocalDate.of(2000 + num, 1, 1));
+        customer.setAadharNo("123123123" + i );
+        customer.setPhoneNumber("1234123" + i);
         return customer;
     }
 
@@ -89,7 +92,9 @@ public class CustomerAccountControllerTest {
         return account;
     }
 
-    private Employee createEmployee(int i){
+    private Employee createEmployee(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         Employee employee = new Employee();
         employee.setName("Parth " + i + " William");
         employee.setUsername("parth1" + i + "23");
@@ -97,8 +102,8 @@ public class CustomerAccountControllerTest {
         employee.setEmail("pa" + i + "rth@example.com");
         employee.setGender(PersonGender.MALE);
         employee.setAddress("Mars" + i);
-        employee.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
-        employee.setPhoneNumber("12341234" + i);
+        employee.setDateOfBirth(LocalDate.of(2000 + num, 1, 1));
+        employee.setPhoneNumber("1234123" + i);
         employee.setEmployeeRole(EmployeeRole.TELLER);
         employee.setEmployeeStatus(EmployeeStatus.ACTIVE);
 
@@ -156,6 +161,18 @@ public class CustomerAccountControllerTest {
     }
 
     @Test
+    public void whenViewCustomerAccountsButCustomerDoesNotExist_ThenNotFound() throws Exception{
+        Customer customer = new Customer();
+        customer.setUsername("IDoNotExist");
+
+        mockMvc.perform(get("/api/customer/accounts")
+                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
     public void whenNoCustomer_ThenUnauthorized() throws Exception{
         mockMvc.perform(get("/api/customer/accounts"))
                 .andExpect(status().isUnauthorized());
@@ -191,31 +208,63 @@ public class CustomerAccountControllerTest {
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
                 .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
                 .andExpect(jsonPath("$.accountStatus").value(account.getAccountStatus().toString()))
-                .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                 .andExpect(jsonPath("$.balance").value(0.0))
                 .andExpect(jsonPath("$.customerName").value(customer.getName()));
     }
 
     @Test
-    public void whenViewInvalidAccount_ThenAccountNotFound() throws Exception{
+    public void whenViewParticularCustomerAccountButCustomerDoesNotExist_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(100);
+        Account account = createAccount();
+        customer.addAccount(account);
+        customerRepository.save(customer);
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
+                .with(user("IDONotExist").roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void whenViewParticularCustomerAccountWithInvalidAcocuntId_ThenAccountNotFound() throws Exception{
+        Customer customer = createCustomer(101);
+        customerRepository.save(customer);
+
+        Long wrongAccountId = 9999999999999L;
+        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}", wrongAccountId)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Account not found."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void whenViewParticularCustomerAccountButWithOtherCustomerAccount_ThenUnauthorized() throws Exception{
+        Customer customer0 = createCustomer(102);
+        Account account = createAccount();
+        account.setCustomer(customer0);
+        customer0.addAccount(account);
+
+        Customer customer1 = createCustomer(103);
+
+        customerRepository.saveAll(List.of(customer0, customer1));
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
+    }
+
+    @Test
+    public void whenDeleteAccountWithInvalidAccount_ThenAccountNotFound() throws Exception{
         Customer customer = createCustomer(31);
         customerRepository.save(customer);
 
         Long wrongAccountId = 123123123123L;
-        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}", wrongAccountId)
-                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Account not found."));
-
-        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/transactions", wrongAccountId)
-                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Account not found."));
-
-        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/balance", wrongAccountId)
-                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Account not found."));
 
         mockMvc.perform(post("/api/customer/accounts/{wrongAccountId}/close", wrongAccountId)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
@@ -225,7 +274,7 @@ public class CustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewOtherCustomerAccount_ThenAccountAccessDenied() throws Exception{
+    public void whenDeleteOtherCustomerAccount_ThenAccountAccessDenied() throws Exception{
         Customer customer0 = createCustomer(32);
         Account account = createAccount();
         account.setCustomer(customer0);
@@ -235,21 +284,6 @@ public class CustomerAccountControllerTest {
 
         customerRepository.saveAll(List.of(customer0, customer1));
         accountRepository.save(account);
-
-        mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
-                .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
-
-        mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
-                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
-
-        mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
-                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."));
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
                         .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
@@ -267,9 +301,9 @@ public class CustomerAccountControllerTest {
         Transaction transaction0 = createTransaction(1);
         Transaction transaction1 = createTransaction(2);
         Transaction transaction2 = createTransaction(3);
-        account.addTransaction(transaction0);
-        account.addTransaction(transaction1);
-        account.addTransaction(transaction2);
+        transaction2.setFromAccount(account);
+        transaction1.setFromAccount(account);
+        transaction0.setFromAccount(account);
 
         customerRepository.save(customer);
         accountRepository.save(account);
@@ -279,11 +313,11 @@ public class CustomerAccountControllerTest {
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
-                .andExpect(jsonPath("$.content[0].accountId").value(account.getId()))
+                .andExpect(jsonPath("$.content[0].fromAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.content[1].transactionId").value(transaction1.getId()))
-                .andExpect(jsonPath("$.content[1].accountId").value(account.getId()))
+                .andExpect(jsonPath("$.content[1].fromAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.content[2].transactionId").value(transaction2.getId()))
-                .andExpect(jsonPath("$.content[2].accountId").value(account.getId()));
+                .andExpect(jsonPath("$.content[2].fromAccountId").value(account.getId()));
     }
 
     @Test
@@ -301,6 +335,52 @@ public class CustomerAccountControllerTest {
     }
 
     @Test
+    public void whenViewAllTransactionsWithInvalidCustomer_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(104);
+        Account account = createAccount();
+        customer.addAccount(account);
+        customerRepository.save(customer);
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
+                .with(user("IDoNotExist").roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void whenViewAllTransactionsWithInvalidAccountId_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(105);
+        customerRepository.save(customer);
+
+        Long wrongAccountId = 123123123123L;
+        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/transactions", wrongAccountId)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Account not found."));
+    }
+
+    @Test
+    public void whenViewOtherCustomerTransactions_ThenUnauthorized() throws Exception{
+        Customer customer0 = createCustomer(106);
+        Account account = createAccount();
+        account.setCustomer(customer0);
+        customer0.addAccount(account);
+
+        Customer customer1 = createCustomer(107);
+
+        customerRepository.saveAll(List.of(customer0, customer1));
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @Test
     public void whenViewBalance_ThenOk() throws Exception{
         Customer customer = createCustomer(36);
         Account account = createAccount();
@@ -314,6 +394,70 @@ public class CustomerAccountControllerTest {
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(2000.0));
+    }
+
+    @Test
+    public void whenViewBalanceButCustomerDoesNotExist_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(108);
+        Account account = createAccount();
+        customer.addAccount(account);
+        customerRepository.save(customer);
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
+                .with(user("IDoNotExist").roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void whenViewBalanceWithInvalidAccount_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(109);
+        customerRepository.save(customer);
+
+        Long wrongAccountId = 123123123123L;
+
+        mockMvc.perform(get("/api/customer/accounts/{wrongAccountId}/balance", wrongAccountId)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Account not found."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
+    public void whenViewOtherCustomerBalance_ThenUnauthorized() throws Exception{
+        Customer customer0 = createCustomer(110);
+        Account account = createAccount();
+        account.setCustomer(customer0);
+        customer0.addAccount(account);
+
+        Customer customer1 = createCustomer(111);
+
+        customerRepository.saveAll(List.of(customer0, customer1));
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
+                        .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("You are not authorized to access this account."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.FORBIDDEN.value()));
+    }
+
+    @Test
+    public void whenViewBalanceWithInactiveAccount_ThenBadRequest() throws Exception{
+        Customer customer = createCustomer(112);
+        Account account = createAccount();
+        account.setAccountStatus(AccountStatus.INACTIVE);
+        customer.addAccount(account);
+        customerRepository.save(customer);
+        accountRepository.save(account);
+
+        mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Your account is currently not active."))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
     @Test
@@ -338,6 +482,23 @@ public class CustomerAccountControllerTest {
     }
 
     @Test
+    public void whenCreateAccountWithInvalidCustomer_ThenNotFound() throws Exception{
+        Customer customer = new Customer();
+        customer.setUsername("IDoNotExist");
+        AccountRequestDTO requestDTO = new AccountRequestDTO();
+        requestDTO.setAccountType(AccountType.CURRENT);
+        String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+        mockMvc.perform(post("/api/customer/accounts")
+                .with(user(customer.getUsername()).roles(customer.getRole().toString()))
+                .contentType("application/json")
+                .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
+    }
+
+    @Test
     public void whenNoAccountType_ThenBadRequest() throws Exception{
         Customer customer = createCustomer(38);
         AccountRequestDTO requestDTO = new AccountRequestDTO();
@@ -355,7 +516,6 @@ public class CustomerAccountControllerTest {
     public void whenCreateAccountWithSameAccountType_ThenDuplicateAccount() throws Exception {
         Customer customer = createCustomer(39);
         Account account = createAccount();
-        account.setCustomer(customer);
         customer.addAccount(account);
         AccountRequestDTO requestDTO = new AccountRequestDTO();
         requestDTO.setAccountType(AccountType.CURRENT);
@@ -372,19 +532,13 @@ public class CustomerAccountControllerTest {
     }
 
     @Test
-    public void whenAccountInactive_ThenException() throws Exception{
+    public void whenDeleteAccountInactive_ThenException() throws Exception{
         Customer customer = createCustomer(40);
         Account account = createAccount();
         account.setAccountStatus(AccountStatus.INACTIVE);
-        account.setCustomer(customer);
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
-
-        mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
-                .with(user(customer.getUsername()).roles(customer.getRole().toString())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."));
 
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
@@ -397,7 +551,6 @@ public class CustomerAccountControllerTest {
         Customer customer = createCustomer(41);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(1000));
-        account.setCustomer(customer);
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
@@ -413,7 +566,6 @@ public class CustomerAccountControllerTest {
     public void whenDeleteAccount_ThenOk() throws Exception{
         Customer customer = createCustomer(42);
         Account account = createAccount();
-        account.setCustomer(customer);
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
@@ -424,6 +576,21 @@ public class CustomerAccountControllerTest {
 
         Account updatedAccount = accountRepository.findById(account.getId()).orElseThrow();
         assertEquals(AccountStatus.CLOSED, updatedAccount.getAccountStatus());
+    }
+
+    @Test
+    public void whenDeleteAccountButCustomerDoesNotExist_ThenNotFound() throws Exception{
+        Customer customer = createCustomer(113);
+        Account account = createAccount();
+        customer.addAccount(account);
+        customerRepository.save(customer);
+        accountRepository.save(account);
+
+        mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
+                .with(user("IDoNotExist").roles(customer.getRole().toString())))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
@@ -441,7 +608,6 @@ public class CustomerAccountControllerTest {
         loan.setTenureInMonths(36);
         loan.setAccount(account);
         account.addLoan(loan);
-        account.setCustomer(customer);
         customer.addAccount(account);
         customerRepository.save(customer);
         employeeRepository.save(employee);
@@ -452,4 +618,6 @@ public class CustomerAccountControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("You currently have active loan. Please clear them before deleting the account."));
     }
+
+
 }

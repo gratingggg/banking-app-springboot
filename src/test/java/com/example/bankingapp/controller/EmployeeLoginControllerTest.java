@@ -41,7 +41,9 @@ public class EmployeeLoginControllerTest {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private Employee createEmployee(int i){
+    private Employee createEmployee(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         Employee employee = new Employee();
         employee.setName("Parth " + i + " William");
         employee.setUsername("parth1" + i + "23");
@@ -49,15 +51,17 @@ public class EmployeeLoginControllerTest {
         employee.setEmail("pa" + i + "rth@example.com");
         employee.setGender(PersonGender.MALE);
         employee.setAddress("Mars" + i);
-        employee.setDateOfBirth(LocalDate.of(2000 + i, 1, 1));
-        employee.setPhoneNumber("12341234" + i);
+        employee.setDateOfBirth(LocalDate.of(2000 + num, 1, 1));
+        employee.setPhoneNumber("1234123" + i);
         employee.setEmployeeRole(EmployeeRole.TELLER);
         employee.setEmployeeStatus(EmployeeStatus.ACTIVE);
 
         return employee;
     }
 
-    private EmployeeLoginDTO createEmployeeLoginDTO(int i){
+    private EmployeeLoginDTO createEmployeeLoginDTO(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         EmployeeLoginDTO dto = new EmployeeLoginDTO();
         dto.setUsername("parth1" + i + "23");
         dto.setPassword("secret" + i);
@@ -65,15 +69,17 @@ public class EmployeeLoginControllerTest {
         return dto;
     }
 
-    private ResultMatcher[] assertEmployeeDTO(int i){
+    private ResultMatcher[] assertEmployeeDTO(int num){
+        String i = "" + num;
+        if(num < 100) i = "0" + num;
         return new ResultMatcher[]{
                 jsonPath("$.name").value("Parth " + i + " William"),
                 jsonPath("$.username").value("parth1" + i + "23"),
                 jsonPath("$.email").value("pa" + i + "rth@example.com"),
                 jsonPath("$.gender").value("MALE"),
                 jsonPath("$.address").value("Mars" + i),
-                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + i)),
-                jsonPath("$.phoneNumber").value("12341234" + i),
+                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + num)),
+                jsonPath("$.phoneNumber").value("1234123" + i),
                 jsonPath("$.employeeRole").value("TELLER"),
                 jsonPath("$.employeeStatus").value("ACTIVE")
         };
@@ -168,7 +174,7 @@ public class EmployeeLoginControllerTest {
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("Your account is invalid. Please contact the admin."))
+                .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
     }
 }

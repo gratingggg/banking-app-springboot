@@ -13,7 +13,9 @@ public class TransactionResponseDTO {
 
     private BigDecimal amount;
 
-    private Long accountId;
+    private Long fromAccountId;
+
+    private Long toAccountId;
 
     private Long loanId;
 
@@ -41,12 +43,20 @@ public class TransactionResponseDTO {
         this.amount = amount;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public Long getFromAccountId() {
+        return fromAccountId;
     }
 
-    public void setAccountId(Long accountId) {
-        this.accountId = accountId;
+    public void setFromAccountId(Long fromAccountId) {
+        this.fromAccountId = fromAccountId;
+    }
+
+    public Long getToAccountId() {
+        return toAccountId;
+    }
+
+    public void setToAccountId(Long toAccountId) {
+        this.toAccountId = toAccountId;
     }
 
     public Long getLoanId() {

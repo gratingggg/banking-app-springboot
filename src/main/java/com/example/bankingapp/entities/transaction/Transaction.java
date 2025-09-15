@@ -25,9 +25,12 @@ public class Transaction extends BaseEntity {
     private BigDecimal amount;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
-    @NotNull(message = "Account cannot be null")
-    private Account account;
+    @JoinColumn(name = "from_account_id")
+    private Account fromAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "to_account_id")
+    private Account toAccount;
 
     @ManyToOne
     @JoinColumn(name = "Loan_id")
@@ -44,11 +47,10 @@ public class Transaction extends BaseEntity {
     private TransactionStatus transactionStatus;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    @NotNull(message = "Employee cannot be null")
+    @JoinColumn(name = "employee_id")
     private Employee handledBy;
 
-    @Column(name = "failure_reasons", nullable = true)
+    @Column(name = "failure_reasons")
     private String failureReason;
 
     public LocalDate getDateOfTransaction() {
@@ -65,14 +67,6 @@ public class Transaction extends BaseEntity {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
     }
 
     public Loan getLoan() {
@@ -105,6 +99,22 @@ public class Transaction extends BaseEntity {
 
     public void setHandledBy(Employee handledBy) {
         this.handledBy = handledBy;
+    }
+
+    public Account getFromAccount() {
+        return fromAccount;
+    }
+
+    public void setFromAccount(Account fromAccount) {
+        this.fromAccount = fromAccount;
+    }
+
+    public Account getToAccount() {
+        return toAccount;
+    }
+
+    public void setToAccount(Account toAccount) {
+        this.toAccount = toAccount;
     }
 
     public boolean isDebit(){
