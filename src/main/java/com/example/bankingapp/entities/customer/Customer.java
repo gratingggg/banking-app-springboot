@@ -32,9 +32,7 @@ public class Customer extends Person {
     @OneToMany(mappedBy = "customer")
     private final List<Account> accounts = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "customer_id")
-    @OrderBy("date")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Notification> notifications = new LinkedHashSet<>();
 
     @Column(name = "role", nullable = false)

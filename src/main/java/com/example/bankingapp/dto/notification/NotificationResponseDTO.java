@@ -4,17 +4,28 @@ import com.example.bankingapp.entities.notification.NotificationStatus;
 import com.example.bankingapp.entities.notification.NotificationType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class NotificationResponseDTO {
+
+    private Long notificationId;
+
     private String message;
 
     @JsonFormat(pattern = "dd-MM-yyyy")
-    private LocalDate date;
+    private LocalDateTime date;
 
     private NotificationStatus notificationStatus;
 
     private NotificationType notificationType;
+
+    public Long getNotificationId() {
+        return notificationId;
+    }
+
+    public void setNotificationId(Long notificationId) {
+        this.notificationId = notificationId;
+    }
 
     public String getMessage() {
         return message;
@@ -24,11 +35,11 @@ public class NotificationResponseDTO {
         this.message = message;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

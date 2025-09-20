@@ -5,11 +5,11 @@ import com.example.bankingapp.entities.transaction.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TransactionResponseDTO {
     @JsonFormat(pattern = "dd-MM-yyyy")
-    private LocalDate dateOfTransaction;
+    private LocalDateTime dateOfTransaction;
 
     private BigDecimal amount;
 
@@ -27,11 +27,11 @@ public class TransactionResponseDTO {
 
     private String failureReason;
 
-    public LocalDate getDateOfTransaction() {
+    public LocalDateTime getDateOfTransaction() {
         return dateOfTransaction;
     }
 
-    public void setDateOfTransaction(LocalDate dateOfTransaction) {
+    public void setDateOfTransaction(LocalDateTime dateOfTransaction) {
         this.dateOfTransaction = dateOfTransaction;
     }
 

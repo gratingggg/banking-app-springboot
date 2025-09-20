@@ -1,13 +1,14 @@
 package com.example.bankingapp.entities.notification;
 
 import com.example.bankingapp.entities.baseentities.BaseEntity;
+import com.example.bankingapp.entities.customer.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notifications")
@@ -19,7 +20,7 @@ public class Notification extends BaseEntity {
     @Column(name = "date")
     @NotNull(message = "Date cannot be null")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(name = "status")
     @NotNull(message = "Status cannot be null")
@@ -31,6 +32,18 @@ public class Notification extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -39,11 +52,11 @@ public class Notification extends BaseEntity {
         this.message = message;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

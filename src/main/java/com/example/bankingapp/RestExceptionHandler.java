@@ -39,13 +39,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({CustomerNotFoundException.class, AccountNotFoundException.class,
-            EmployeeNotFoundException.class})
+            EmployeeNotFoundException.class, TransactionNotFoundException.class,
+            NotificationNotFoundException.class, LoanNotFoundException.class})
     public ResponseEntity<Object> handleCustomerNotFound(Exception ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value()));
     }
 
-    @ExceptionHandler({AccountAccessDeniedException.class})
+    @ExceptionHandler({AccountAccessDeniedException.class, TransactionAccessDeniedException.class,
+            NotificationAccessDeniedException.class})
     public ResponseEntity<Object> handleAccountAccessDeniedException(Exception ex){
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN.value()));

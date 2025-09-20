@@ -5,6 +5,8 @@ import com.example.bankingapp.dto.account.AccountRequestDTO;
 import com.example.bankingapp.dto.account.AccountResponseDTO;
 import com.example.bankingapp.dto.account.AccountSummaryDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.entities.transaction.TransactionStatus;
+import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.service.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,9 +42,16 @@ public class AccountController {
     }
 
     @GetMapping("/customer/accounts/{accountId}/transactions")
-    public ResponseEntity<Page<TransactionResponseDTO>> getAllAccountTransaction(@PathVariable Long accountId, @RequestParam(defaultValue = "0", required = false) int page,
-                                                                          @RequestParam(defaultValue = "10", required = false) int size, Principal principal){
-        Page<TransactionResponseDTO> responseDTO = accountService.getAllAccountTransactions(accountId, page, size, principal.getName());
+    public ResponseEntity<Page<TransactionResponseDTO>> getAllAccountTransaction(@PathVariable Long accountId,
+                                                                                 @RequestParam(defaultValue = "0", required = false) int page,
+                                                                                 @RequestParam(defaultValue = "10", required = false) int size,
+                                                                                 @RequestParam(required = false) TransactionStatus status,
+                                                                                 @RequestParam(required = false) TransactionType type,
+                                                                                 @RequestParam(required = false) LocalDate fromDate,
+                                                                                 @RequestParam(required = false) LocalDate toDate,
+                                                                                 Principal principal){
+        Page<TransactionResponseDTO> responseDTO = accountService.getAllAccountTransactions(accountId, page, size,
+                status, type, fromDate, toDate,principal.getName());
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -99,8 +109,12 @@ public class AccountController {
     public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfAccountByEmployee(@PathVariable Long accountId,
                                                                                               @RequestParam(required = false, defaultValue = "0") int page,
                                                                                               @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                              @RequestParam(required = false) TransactionStatus status,
+                                                                                              @RequestParam(required = false) TransactionType type,
+                                                                                              @RequestParam(required = false) LocalDate fromDate,
+                                                                                              @RequestParam(required = false) LocalDate toDate,
                                                                                               Principal principal){
-        Page<TransactionResponseDTO> responseDTOS = accountService.getAllAccountTransactionsByEmployee(accountId, page, size, principal.getName());
+        Page<TransactionResponseDTO> responseDTOS = accountService.getAllAccountTransactionsByEmployee(accountId, page, size, status, type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(responseDTOS);
     }
 
@@ -116,8 +130,13 @@ public class AccountController {
     public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfCustomer(@PathVariable Long customerId,
                                                                                      @RequestParam(required = false, defaultValue = "0") int page,
                                                                                      @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                     @RequestParam(required = false) TransactionStatus status,
+                                                                                     @RequestParam(required = false) TransactionType type,
+                                                                                     @RequestParam(required = false) LocalDate fromDate,
+                                                                                     @RequestParam(required = false) LocalDate toDate,
                                                                                      Principal principal){
-        Page<TransactionResponseDTO> responseDTOS = accountService.getAllTransactionsOfCustomer(customerId, page, size, principal.getName());
+        Page<TransactionResponseDTO> responseDTOS = accountService.getAllTransactionsOfCustomer(customerId, page, size,
+                status, type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(responseDTOS);
     }
 

@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -115,7 +117,7 @@ public class EmployeeCustomerAccountControllerTest {
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAmount(BigDecimal.valueOf(299));
-        transaction.setDateOfTransaction(LocalDate.now());
+        transaction.setDateOfTransaction(LocalDateTime.now());
         transaction.setHandledBy(null);
         transaction.setFailureReason(null);
 
@@ -833,7 +835,10 @@ public class EmployeeCustomerAccountControllerTest {
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
-        LocalDate baseDate = LocalDate.of(2020, 8, 15);
+        LocalDateTime baseDate = LocalDateTime.of(
+                LocalDate.of(2020, 8, 15),
+                LocalTime.of(7, 35, 26)
+        );
         for(int i = 0; i < 10; i++){
             Transaction transaction = createTransaction();
             transaction.setToAccount(account);
@@ -851,11 +856,11 @@ public class EmployeeCustomerAccountControllerTest {
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").exists())
-                .andExpect(jsonPath("$.content[0].amount").value(2160.0))
+                .andExpect(jsonPath("$.content[0].amount").value(270.0))
                 .andExpect(jsonPath("$.content[1].transactionId").exists())
-                .andExpect(jsonPath("$.content[1].amount").value(3430.0))
+                .andExpect(jsonPath("$.content[1].amount").value(80.0))
                 .andExpect(jsonPath("$.content[2].transactionId").exists())
-                .andExpect(jsonPath("$.content[2].amount").value(5120.0));
+                .andExpect(jsonPath("$.content[2].amount").value(10.0));
     }
 
     @Test
@@ -1201,11 +1206,11 @@ public class EmployeeCustomerAccountControllerTest {
     public void whenWithdrawMoneyButLimitReached_ThenOk() throws Exception{
         Customer customer = createCustomer(94);
         Account account = createAccount();
-        account.setBalance(BigDecimal.valueOf(5000));
+        account.setBalance(BigDecimal.valueOf(500000));
         Transaction transaction = createTransaction();
         transaction.setAmount(BigDecimal.valueOf(50000));
         transaction.setTransactionType(TransactionType.WITHDRAWAL);
-        transaction.setToAccount(account);
+        transaction.setFromAccount(account);
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);

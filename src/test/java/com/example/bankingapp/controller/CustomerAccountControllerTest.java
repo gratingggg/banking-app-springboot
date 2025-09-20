@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public class CustomerAccountControllerTest {
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
         transaction.setTransactionType(TransactionType.DEPOSIT);
         transaction.setAmount(BigDecimal.valueOf(i * i * 100));
-        transaction.setDateOfTransaction(LocalDate.now());
+        transaction.setDateOfTransaction(LocalDateTime.now());
 
         Employee employee = createEmployee(16);
         transaction.setHandledBy(employee);

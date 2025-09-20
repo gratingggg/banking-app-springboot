@@ -4,20 +4,25 @@ import com.example.bankingapp.dto.customer.CustomerLoginDTO;
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerResponseDTO;
 import com.example.bankingapp.entities.customer.Customer;
+import com.example.bankingapp.entities.notification.NotificationType;
 import com.example.bankingapp.exception.*;
 import com.example.bankingapp.repository.CustomerRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
-    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder,
+                           NotificationService notificationService) {
         this.passwordEncoder = passwordEncoder;
         this.customerRepository = customerRepository;
+        this.notificationService = notificationService;
     }
 
     private void setBasicFields(Customer customer, CustomerRequestDTO customerRequestDTO) {
@@ -70,6 +75,7 @@ public class CustomerService {
         return customerResponseDTO;
     }
 
+    @Transactional
     public CustomerResponseDTO processCustomerRegistration(CustomerRequestDTO customerRequestDTO) {
         Customer customer = new Customer();
 
@@ -80,6 +86,9 @@ public class CustomerService {
         }
 
         customerRepository.save(customer);
+        String message = "Welcome " + customer.getName() + "! Your registration was successful." +
+                "You can now log in and start managing your banking activities securely.";
+        notificationService.createNotification(customer, NotificationType.INFO, message);
 
         return mapCustomerToDTO(customer);
     }

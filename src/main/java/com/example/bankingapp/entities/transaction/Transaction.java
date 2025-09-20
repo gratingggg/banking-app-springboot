@@ -1,8 +1,8 @@
 package com.example.bankingapp.entities.transaction;
 
 import com.example.bankingapp.entities.account.Account;
-import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
+import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.loan.Loan;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import org.springframework.core.style.ToStringCreator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
@@ -18,7 +18,7 @@ public class Transaction extends BaseEntity {
     @Column(name = "date", nullable = false)
     @NotNull(message = "Date of transaction cannot be null")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private LocalDate dateOfTransaction;
+    private LocalDateTime dateOfTransaction;
 
     @Column(name = "amount", nullable = false)
     @NotNull(message = "Amount cannot be null")
@@ -53,11 +53,11 @@ public class Transaction extends BaseEntity {
     @Column(name = "failure_reasons")
     private String failureReason;
 
-    public LocalDate getDateOfTransaction() {
+    public LocalDateTime getDateOfTransaction() {
         return dateOfTransaction;
     }
 
-    public void setDateOfTransaction(LocalDate dateOfTransaction) {
+    public void setDateOfTransaction(LocalDateTime dateOfTransaction) {
         this.dateOfTransaction = dateOfTransaction;
     }
 
