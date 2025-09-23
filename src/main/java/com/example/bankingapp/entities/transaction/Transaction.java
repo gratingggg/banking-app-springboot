@@ -145,13 +145,15 @@ public class Transaction extends BaseEntity {
 
     @Override
     public String toString(){
-        return new ToStringCreator(this)
+        ToStringCreator string =  new ToStringCreator(this)
                 .append("id : ", getId())
                 .append("date : ", getDateOfTransaction())
                 .append("amount : ", getAmount())
                 .append("type : ", getTransactionType())
-                .append("status : ", getTransactionStatus())
-                .append("handled by : ", getHandledBy().getName())
-                .toString();
+                .append("status : ", getTransactionStatus());
+
+        if(handledBy != null) string.append("handled by : " + handledBy);
+
+        return string.toString();
     }
 }

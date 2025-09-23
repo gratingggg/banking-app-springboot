@@ -1,4 +1,4 @@
-package com.example.bankingapp.controller;
+package com.example.bankingapp;
 
 import com.example.bankingapp.dto.account.AccountRequestDTO;
 import com.example.bankingapp.entities.account.Account;
@@ -12,15 +12,18 @@ import com.example.bankingapp.entities.employee.EmployeeStatus;
 import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.loan.LoanStatus;
 import com.example.bankingapp.entities.loan.LoanType;
+import com.example.bankingapp.entities.notification.Notification;
 import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
+import com.example.bankingapp.specification.NotificationSpecifications;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,38 +44,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmployeeCustomerAccountControllerTest {
+public class EmployeeCustomerAccountTests {
     private final MockMvc mockMvc;
-    private final CustomerRepository customerRepository;
-    private final AccountRepository accountRepository;
-    private final TransactionRepository transactionRepository;
-    private final EmployeeRepository employeeRepository;
+    private final ObjectMapper objectMapper;
     private final LoanRepository loanRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ObjectMapper objectMapper;
+    private final AccountRepository accountRepository;
+    private final CustomerRepository customerRepository;
+    private final EmployeeRepository employeeRepository;
+    private final TransactionRepository transactionRepository;
+    private final NotificationRepository notificationRepository;
 
     @Autowired
-    public EmployeeCustomerAccountControllerTest(MockMvc mockMvc,
-                                                 CustomerRepository customerRepository,
-                                                 AccountRepository accountRepository,
-                                                 TransactionRepository transactionRepository,
-                                                 EmployeeRepository employeeRepository,
-                                                 LoanRepository loanRepository,
-                                                 PasswordEncoder passwordEncoder,
-                                                 ObjectMapper objectMapper) {
+    public EmployeeCustomerAccountTests(MockMvc mockMvc,
+                                        ObjectMapper objectMapper,
+                                        LoanRepository loanRepository,
+                                        PasswordEncoder passwordEncoder,
+                                        AccountRepository accountRepository,
+                                        CustomerRepository customerRepository,
+                                        EmployeeRepository employeeRepository,
+                                        TransactionRepository transactionRepository,
+                                        NotificationRepository notificationRepository) {
         this.mockMvc = mockMvc;
-        this.customerRepository = customerRepository;
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
-        this.employeeRepository = employeeRepository;
+        this.objectMapper = objectMapper;
         this.loanRepository = loanRepository;
         this.passwordEncoder = passwordEncoder;
-        this.objectMapper = objectMapper;
+        this.accountRepository = accountRepository;
+        this.customerRepository = customerRepository;
+        this.employeeRepository = employeeRepository;
+        this.transactionRepository = transactionRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     private Customer createCustomer(int num) {
         String i = "" + num;
-        if(num < 100) i = "0" + num;
+        if (num < 100) i = "0" + num;
         Customer customer = new Customer();
         customer.setName("Rudra " + i + " Ceaser");
         customer.setUsername("rudra1" + i + "23");
@@ -206,7 +212,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllAccountsOfCustomerWithNoAccount_ThenOk() throws Exception{
+    public void whenViewAllAccountsOfCustomerWithNoAccount_ThenOk() throws Exception {
         Customer customer = createCustomer(49);
         customerRepository.save(customer);
 
@@ -219,7 +225,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewParticularAccount_ThenOk() throws Exception{
+    public void whenViewParticularAccount_ThenOk() throws Exception {
         Customer customer = createCustomer(50);
         Account account = createAccount();
         customer.addAccount(account);
@@ -230,7 +236,7 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
                 .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
@@ -241,7 +247,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewParticularAccountWithWrongRole_ThenForbidden() throws Exception{
+    public void whenViewParticularAccountWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(51);
         Account account = createAccount();
         customer.addAccount(account);
@@ -255,7 +261,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewParticularAccountWithEmployeeDoesNotExist_ThenEmployeeNotFound() throws Exception{
+    public void whenViewParticularAccountWithEmployeeDoesNotExist_ThenEmployeeNotFound() throws Exception {
         Customer customer = createCustomer(52);
         Account account = createAccount();
         customer.addAccount(account);
@@ -269,7 +275,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewParticularAccountWithoutActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenViewParticularAccountWithoutActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(53);
         Account account = createAccount();
         customer.addAccount(account);
@@ -288,7 +294,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewParticularAccountWithInvalidAccountId_ThenNotFound() throws Exception{
+    public void whenViewParticularAccountWithInvalidAccountId_ThenNotFound() throws Exception {
         Account account = new Account();
         account.setId(999999999L);
 
@@ -303,7 +309,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenCreateAccount_ThenOk() throws Exception{
+    public void whenCreateAccount_ThenOk() throws Exception {
         Customer customer = createCustomer(54);
         customerRepository.save(customer);
 
@@ -315,16 +321,19 @@ public class EmployeeCustomerAccountControllerTest {
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
-                .contentType("application/json")
-                .content(requestBody)
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .contentType("application/json")
+                        .content(requestBody)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountId").exists())
                 .andExpect(jsonPath("$.customerName").value(customer.getName()));
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
-    public void whenCreateAccountWithWrongRole_ThenForbidden() throws Exception{
+    public void whenCreateAccountWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(55);
         customerRepository.save(customer);
 
@@ -340,7 +349,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenCreateAccountButEmployeeDoesNotExist_ThenNotFound() throws Exception{
+    public void whenCreateAccountButEmployeeDoesNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(56);
         customerRepository.save(customer);
 
@@ -358,7 +367,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenCreateAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenCreateAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(57);
         customerRepository.save(customer);
 
@@ -381,7 +390,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenCreateAccountWithCustomerNotExist_ThenNotFound() throws Exception{
+    public void whenCreateAccountWithCustomerNotExist_ThenNotFound() throws Exception {
         Customer customer = new Customer();
         customer.setId(999999999L);
 
@@ -402,7 +411,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenCreateAccountWithDuplicateAccountType_ThenException() throws Exception{
+    public void whenCreateAccountWithDuplicateAccountType_ThenException() throws Exception {
         Customer customer = createCustomer(58);
         Account account = createAccount();
         customer.addAccount(account);
@@ -426,7 +435,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccount_ThenOk() throws Exception{
+    public void whenDeleteAccount_ThenOk() throws Exception {
         Customer customer = createCustomer(59);
         Account account = createAccount();
         customer.addAccount(account);
@@ -437,7 +446,7 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
@@ -446,10 +455,13 @@ public class EmployeeCustomerAccountControllerTest {
                 .andExpect(jsonPath("$.balance").value(0.0))
                 .andExpect(jsonPath("$.customerName").value(account.getCustomer().getName()))
                 .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
-    public void whenDeleteAccountWithWrongRole_ThenForbidden() throws Exception{
+    public void whenDeleteAccountWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(60);
         Account account = createAccount();
         customer.addAccount(account);
@@ -465,7 +477,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithEmployeeDoesNotExist_ThenNotFound() throws Exception{
+    public void whenDeleteAccountWithEmployeeDoesNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(61);
         Account account = createAccount();
         customer.addAccount(account);
@@ -480,7 +492,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenDeleteAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(62);
         Account account = createAccount();
         customer.addAccount(account);
@@ -499,7 +511,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithAccountDoesNotExist_ThenNotFound() throws Exception{
+    public void whenDeleteAccountWithAccountDoesNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(63);
         customerRepository.save(customer);
 
@@ -517,7 +529,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithNotActiveAccount_ThenException() throws Exception{
+    public void whenDeleteAccountWithNotActiveAccount_ThenException() throws Exception {
         Customer customer = createCustomer(64);
         Account account = createAccount();
         account.setAccountStatus(AccountStatus.CLOSED);
@@ -536,7 +548,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithActiveLoan_ThenException() throws Exception{
+    public void whenDeleteAccountWithActiveLoan_ThenException() throws Exception {
         Customer customer = createCustomer(65);
         Account account = createAccount();
         customer.addAccount(account);
@@ -563,7 +575,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDeleteAccountWithNonZeroBalance_ThenException() throws Exception{
+    public void whenDeleteAccountWithNonZeroBalance_ThenException() throws Exception {
         Customer customer = createCustomer(66);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(2000));
@@ -582,7 +594,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccount_ThenOk() throws Exception{
+    public void whenViewAllTransactionsOfAccount_ThenOk() throws Exception {
         Customer customer = createCustomer(67);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -618,7 +630,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountWithWrongRole_ThenForbidden() throws Exception{
+    public void whenViewAllTransactionsOfAccountWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(68);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -634,7 +646,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountWithEmployeeNotExist_ThenNotFound() throws Exception{
+    public void whenViewAllTransactionsOfAccountWithEmployeeNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(69);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -652,7 +664,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenViewAllTransactionsOfAccountWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(70);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -674,7 +686,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountButAccountDoesNotExist_ThenNotFound() throws Exception{
+    public void whenViewAllTransactionsOfAccountButAccountDoesNotExist_ThenNotFound() throws Exception {
         Account account = new Account();
         account.setId(999999999L);
         Employee employee = createEmployee(38);
@@ -688,7 +700,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountWithNoTransactions_ThenOk() throws Exception{
+    public void whenViewAllTransactionsOfAccountWithNoTransactions_ThenOk() throws Exception {
         Customer customer = createCustomer(71);
         Account account = createAccount();
         customer.addAccount(account);
@@ -704,16 +716,16 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsOfAccountWithPageRequests_ThenOk() throws Exception{
+    public void whenViewAllTransactionsOfAccountWithPageRequests_ThenOk() throws Exception {
         Customer customer = createCustomer(72);
         Account account = createAccount();
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             Transaction transaction = createTransaction();
             transaction.setFromAccount(account);
-            transaction.setAmount(BigDecimal.valueOf(i*i*i*10));
+            transaction.setAmount(BigDecimal.valueOf(i * i * i * 10));
             transactionRepository.save(transaction);
         }
 
@@ -734,7 +746,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactions_ThenOk() throws Exception{
+    public void whenViewAllTransactions_ThenOk() throws Exception {
         Customer customer = createCustomer(73);
         Account account0 = createAccount();
         Account account1 = createAccount();
@@ -752,14 +764,14 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
                 .andExpect(jsonPath("$.content[1].transactionId").value(transaction1.getId()));
     }
 
     @Test
-    public void whenViewAllTransactionsWithWrongRole_ThenForbidden() throws Exception{
+    public void whenViewAllTransactionsWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(74);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -775,7 +787,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsWithEmployeeNotExist_ThenNotFound() throws Exception{
+    public void whenViewAllTransactionsWithEmployeeNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(75);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -793,7 +805,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenViewAllTransactionWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(76);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -815,7 +827,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsWithCustomerNotExist_ThenNotFound() throws Exception{
+    public void whenViewAllTransactionsWithCustomerNotExist_ThenNotFound() throws Exception {
         Customer customer = new Customer();
         customer.setId(999999L);
         Employee employee = createEmployee(43);
@@ -829,7 +841,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsWithPageRequests_ThenOk() throws Exception{
+    public void whenViewAllTransactionsWithPageRequests_ThenOk() throws Exception {
         Customer customer = createCustomer(77);
         Account account = createAccount();
         customer.addAccount(account);
@@ -839,10 +851,10 @@ public class EmployeeCustomerAccountControllerTest {
                 LocalDate.of(2020, 8, 15),
                 LocalTime.of(7, 35, 26)
         );
-        for(int i = 0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             Transaction transaction = createTransaction();
             transaction.setToAccount(account);
-            transaction.setAmount(BigDecimal.valueOf(i*i*i*10));
+            transaction.setAmount(BigDecimal.valueOf(i * i * i * 10));
             transaction.setDateOfTransaction(baseDate.plusMonths(i));
             transactionRepository.save(transaction);
         }
@@ -864,7 +876,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewAllTransactionsWithNoTransactions_ThenOk() throws Exception{
+    public void whenViewAllTransactionsWithNoTransactions_ThenOk() throws Exception {
         Customer customer = createCustomer(78);
         customerRepository.save(customer);
 
@@ -877,7 +889,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoney_ThenOk() throws Exception{
+    public void whenDepositMoney_ThenOk() throws Exception {
         Customer customer = createCustomer(79);
         Account account = createAccount();
         customer.addAccount(account);
@@ -888,8 +900,8 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
-                .param("fund", "2000")
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .param("fund", "2000")
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.transactionId").exists())
                 .andExpect(jsonPath("$.amount").value(2000))
@@ -901,10 +913,13 @@ public class EmployeeCustomerAccountControllerTest {
 
         Account updatedAccount = accountRepository.findById(account.getId()).orElseThrow();
         assertEquals(0, updatedAccount.getBalance().compareTo(BigDecimal.valueOf(2000)));
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
-    public void whenDepositMoneyWithWrongRole_ThenForbidden() throws Exception{
+    public void whenDepositMoneyWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(80);
         Account account = createAccount();
         customer.addAccount(account);
@@ -918,7 +933,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyWithEmployeeNotExist_ThenNotFound() throws Exception{
+    public void whenDepositMoneyWithEmployeeNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(81);
         Account account = createAccount();
         customer.addAccount(account);
@@ -934,7 +949,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenDepositMoneyWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(82);
         Account account = createAccount();
         customer.addAccount(account);
@@ -954,7 +969,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyWithAccountDoesNotExist_ThenNotFound() throws Exception{
+    public void whenDepositMoneyWithAccountDoesNotExist_ThenNotFound() throws Exception {
         Account account = new Account();
         account.setId(9999999L);
         Employee employee = createEmployee(48);
@@ -969,7 +984,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyWithMissingParams_ThenBadRequest() throws Exception{
+    public void whenDepositMoneyWithMissingParams_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(83);
         Account account = createAccount();
         customer.addAccount(account);
@@ -980,12 +995,12 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void whenDepositMoneyWithNotActiveAccount_ThenBadRequest() throws Exception{
+    public void whenDepositMoneyWithNotActiveAccount_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(84);
         Account account = createAccount();
         account.setAccountStatus(AccountStatus.CLOSED);
@@ -1005,7 +1020,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyWithNegativeAmount_ThenBadRequest() throws Exception{
+    public void whenDepositMoneyWithNegativeAmount_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(85);
         Account account = createAccount();
         customer.addAccount(account);
@@ -1024,7 +1039,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenDepositMoneyButLimitReached_ThenOk() throws Exception{
+    public void whenDepositMoneyButLimitReached_ThenOk() throws Exception {
         Customer customer = createCustomer(86);
         Account account = createAccount();
         Transaction transaction = createTransaction();
@@ -1039,8 +1054,8 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
-                .param("fund", "2000")
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .param("fund", "2000")
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.transactionId").exists())
                 .andExpect(jsonPath("$.transactionType").value(TransactionType.DEPOSIT.toString()))
@@ -1049,7 +1064,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoney_ThenOk() throws Exception{
+    public void whenWithdrawMoney_ThenOk() throws Exception {
         Customer customer = createCustomer(87);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1074,10 +1089,13 @@ public class EmployeeCustomerAccountControllerTest {
 
         Account updatedAccount = accountRepository.findById(account.getId()).orElseThrow();
         assertEquals(0, updatedAccount.getBalance().compareTo(BigDecimal.valueOf(3000)));
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
-    public void whenWithdrawMoneyWithWrongRole_ThenForbidden() throws Exception{
+    public void whenWithdrawMoneyWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(88);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1092,7 +1110,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithEmployeeNotExist_ThenNotFound() throws Exception{
+    public void whenWithdrawMoneyWithEmployeeNotExist_ThenNotFound() throws Exception {
         Customer customer = createCustomer(89);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1109,7 +1127,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenWithdrawMoneyWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(90);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1130,7 +1148,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithAccountDoesNotExist_ThenNotFound() throws Exception{
+    public void whenWithdrawMoneyWithAccountDoesNotExist_ThenNotFound() throws Exception {
         Account account = new Account();
         account.setId(9999999L);
         Employee employee = createEmployee(55);
@@ -1145,7 +1163,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawalMoneyWithMissingParams_ThenBadRequest() throws Exception{
+    public void whenWithdrawalMoneyWithMissingParams_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(91);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1162,7 +1180,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithNotActiveAccount_ThenBadRequest() throws Exception{
+    public void whenWithdrawMoneyWithNotActiveAccount_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(92);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1183,7 +1201,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithNegativeAmount_ThenBadRequest() throws Exception{
+    public void whenWithdrawMoneyWithNegativeAmount_ThenBadRequest() throws Exception {
         Customer customer = createCustomer(93);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1203,7 +1221,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyButLimitReached_ThenOk() throws Exception{
+    public void whenWithdrawMoneyButLimitReached_ThenFailure() throws Exception {
         Customer customer = createCustomer(94);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(500000));
@@ -1230,7 +1248,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenWithdrawMoneyWithInvalidBalance_ThenBadRequest() throws Exception{
+    public void whenWithdrawMoneyWithInvalidBalance_ThenFailure() throws Exception {
         Customer customer = createCustomer(95);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1242,15 +1260,15 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
-                .param("fund", "7000")
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Withdrawal amount exceeds your account balance."))
-                .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
+                        .param("fund", "7000")
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.failureReason").value("Insufficient balance."))
+                .andExpect(jsonPath("$.transactionStatus").value(TransactionStatus.FAILED.toString()));
     }
 
     @Test
-    public void whenViewBalance_ThenOk() throws Exception{
+    public void whenViewBalance_ThenOk() throws Exception {
         Customer customer = createCustomer(96);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1262,13 +1280,13 @@ public class EmployeeCustomerAccountControllerTest {
         employeeRepository.save(employee);
 
         mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
-                .with(user(employee.getUsername()).roles(employee.getRole().toString())))
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(5000.0));
     }
 
     @Test
-    public void whenViewBalanceWithWrongRole_ThenForbidden() throws Exception{
+    public void whenViewBalanceWithWrongRole_ThenForbidden() throws Exception {
         Customer customer = createCustomer(97);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1282,7 +1300,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenViewBalanceWithInvalidEmployee_ThenNotFound() throws Exception{
+    public void whenViewBalanceWithInvalidEmployee_ThenNotFound() throws Exception {
         Customer customer = createCustomer(98);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));
@@ -1298,7 +1316,7 @@ public class EmployeeCustomerAccountControllerTest {
     }
 
     @Test
-    public void whenBalanceWithNotActiveEmployee_ThenUnauthorized() throws Exception{
+    public void whenBalanceWithNotActiveEmployee_ThenUnauthorized() throws Exception {
         Customer customer = createCustomer(99);
         Account account = createAccount();
         account.setBalance(BigDecimal.valueOf(5000));

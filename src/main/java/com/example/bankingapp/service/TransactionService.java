@@ -52,7 +52,10 @@ public class TransactionService {
             throw new AccountNotActiveException("Your account is currently " + fromAccount.getAccountStatus() + ". Please contact the admin.");
         }
         if (toAccount.getAccountStatus() != AccountStatus.ACTIVE) {
-            throw new AccountNotFoundException("The recipient's account is currently " + toAccount.getAccountStatus() + ".");
+            throw new AccountNotActiveException("The recipient's account is currently " + toAccount.getAccountStatus() + ".");
+        }
+        if(fromAccount.equals(toAccount)){
+            throw new SameAccountTransactionException();
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new TransactionAmountInvalidException();
@@ -69,7 +72,7 @@ public class TransactionService {
     }
 
     private Employee validateEmployeeFromUsername(String username) {
-        Employee employee = employeeRepository.findByUsername(username).orElseThrow(EmployeeNotFoundException::new);
+        Employee employee = employeeRepository.findByUsername(username).orElseThrow(() -> new EmployeeNotFoundException("Employee with username " + username + " not found."));
         if (employee.getEmployeeStatus() != EmployeeStatus.ACTIVE) {
             throw new EmployeeInactiveException();
         }
@@ -88,6 +91,7 @@ public class TransactionService {
         dto.setTransactionStatus(transaction.getTransactionStatus());
         dto.setTransactionType(transaction.getTransactionType());
         dto.setFailureReason(transaction.getFailureReason());
+        if (transaction.getHandledBy() != null) dto.setHandledBy(transaction.getHandledBy().getName());
 
         return dto;
     }
@@ -109,7 +113,11 @@ public class TransactionService {
 
         String fromMessage = "";
         String toMessage = "";
-        if (totalTodayAmount.compareTo(BigDecimal.valueOf(50000)) > 0) {
+        if(amount.compareTo(fromAccount.getBalance()) > 0){
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transaction.setFailureReason("Insufficient balance.");
+        }
+        else if (totalTodayAmount.compareTo(BigDecimal.valueOf(50000)) > 0) {
             transaction.setTransactionStatus(TransactionStatus.FAILED);
             transaction.setFailureReason("Daily payment limit reached.");
         } else {

@@ -27,6 +27,16 @@ public class TransactionResponseDTO {
 
     private String failureReason;
 
+    private String handledBy;
+
+    public String getHandledBy() {
+        return handledBy;
+    }
+
+    public void setHandledBy(String handledBy) {
+        this.handledBy = handledBy;
+    }
+
     public LocalDateTime getDateOfTransaction() {
         return dateOfTransaction;
     }

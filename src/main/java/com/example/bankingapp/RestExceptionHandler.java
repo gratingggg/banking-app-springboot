@@ -54,7 +54,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({AccountBalanceNotZeroException.class, AccountNotActiveException.class,
-            TransactionAmountInvalidException.class, NonClosedLoanException.class})
+            TransactionAmountInvalidException.class, NonClosedLoanException.class,
+            SameAccountTransactionException.class})
     public ResponseEntity<Object> handleAccountBalanceNotZero(Exception ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value()));

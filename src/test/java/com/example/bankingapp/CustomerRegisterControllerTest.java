@@ -1,4 +1,4 @@
-package com.example.bankingapp.controller;
+package com.example.bankingapp;
 
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.entities.baseentities.PersonGender;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CustomerRegistrationControllerTest {
+public class CustomerRegisterControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -32,8 +32,8 @@ public class CustomerRegistrationControllerTest {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public CustomerRegistrationControllerTest(MockMvc mockMvc, CustomerRepository customerRepository,
-                                              PasswordEncoder passwordEncoder){
+    public CustomerRegisterControllerTest(MockMvc mockMvc, CustomerRepository customerRepository,
+                                          PasswordEncoder passwordEncoder){
         this.mockMvc = mockMvc;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
@@ -97,6 +97,8 @@ public class CustomerRegistrationControllerTest {
                         .content(requestBody))
                 .andExpect(status().isCreated())
                 .andExpectAll(assertCustomerDTO(10));
+
+
     }
 
     @Test

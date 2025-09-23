@@ -33,7 +33,7 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
-    @GetMapping("/notifications/{id}")
+    @GetMapping("/notifications/{notificationId}")
     public ResponseEntity<NotificationResponseDTO> getNotification(@PathVariable Long notificationId, Principal principal){
         NotificationResponseDTO responseDTO = notificationService.getNotification(notificationId, principal.getName());
         return ResponseEntity.ok(responseDTO);

@@ -1,4 +1,4 @@
-package com.example.bankingapp.controller;
+package com.example.bankingapp;
 
 import com.example.bankingapp.dto.employee.EmployeeLoginDTO;
 import com.example.bankingapp.entities.baseentities.PersonGender;
@@ -24,17 +24,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmployeeLoginControllerTest {
+public class EmployeeLoginTests {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployeeLoginControllerTest(MockMvc mockMvc,
-                                       ObjectMapper objectMapper,
-                                       EmployeeRepository employeeRepository,
-                                       PasswordEncoder passwordEncoder){
+    public EmployeeLoginTests(MockMvc mockMvc,
+                              ObjectMapper objectMapper,
+                              EmployeeRepository employeeRepository,
+                              PasswordEncoder passwordEncoder){
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.employeeRepository = employeeRepository;

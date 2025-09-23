@@ -367,7 +367,11 @@ public class AccountService {
         }
 
         String message = "";
-        if(sumAmount.compareTo(BigDecimal.valueOf(50000)) > 0){
+        if(fund.compareTo(account.getBalance()) > 0){
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transaction.setFailureReason("Insufficient balance.");
+        }
+        else if(sumAmount.compareTo(BigDecimal.valueOf(50000)) > 0){
             transaction.setTransactionStatus(TransactionStatus.FAILED);
             transaction.setFailureReason("Daily maximum withdraw limit exceeded.");
         }

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,19 +72,21 @@ public class NotificationService {
         return notificationToDTO(notification);
     }
 
+    @Transactional
     public void readAllNotifications(String username){
         Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new CustomerNotFoundException("The customer with the username " + username + " not found."));
-        notificationRepository.markAllAsRead(NotificationStatus.UNREAD, customer, NotificationStatus.READ);
+        notificationRepository.markAllAsRead(NotificationStatus.READ, customer, NotificationStatus.UNREAD);
     }
 
+    @Transactional
     public void createNotification(Customer customer, NotificationType type, String message){
         Notification notification = new Notification();
         notification.setDate(LocalDateTime.now());
         notification.setMessage(message);
         notification.setNotificationType(type);
         notification.setNotificationStatus(NotificationStatus.UNREAD);
-        notification.setCustomer(customer);
 
+        customer.addNotification(notification);
         notificationRepository.save(notification);
     }
 }

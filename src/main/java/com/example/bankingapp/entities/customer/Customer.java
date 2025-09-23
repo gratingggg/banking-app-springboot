@@ -70,6 +70,7 @@ public class Customer extends Person {
 
     public void addNotification(Notification notification) {
         notifications.add(notification);
+        notification.setCustomer(this);
     }
 
     public Account getAccount(Long accountId) {

@@ -3,7 +3,6 @@ package com.example.bankingapp.entities.account;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.loan.Loan;
-import com.example.bankingapp.exception.TransactionAmountInvalidException;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
@@ -99,9 +98,6 @@ public class Account extends BaseEntity {
     }
 
     public synchronized BigDecimal withdrawal(BigDecimal withdrawalAmount) {
-        if(withdrawalAmount.compareTo(balance) > 0){
-            throw new TransactionAmountInvalidException("Withdrawal amount exceeds your account balance.");
-        }
         balance = balance.subtract(withdrawalAmount);
         return balance;
     }

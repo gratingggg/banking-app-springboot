@@ -1,4 +1,4 @@
-package com.example.bankingapp.controller;
+package com.example.bankingapp;
 
 import com.example.bankingapp.dto.account.AccountRequestDTO;
 import com.example.bankingapp.entities.account.Account;
@@ -12,15 +12,18 @@ import com.example.bankingapp.entities.employee.EmployeeStatus;
 import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.loan.LoanStatus;
 import com.example.bankingapp.entities.loan.LoanType;
+import com.example.bankingapp.entities.notification.Notification;
 import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
+import com.example.bankingapp.specification.NotificationSpecifications;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,30 +43,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CustomerAccountControllerTest {
+public class CustomerAccountTests {
     private final MockMvc mockMvc;
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
     private final EmployeeRepository employeeRepository;
+    private final NotificationRepository notificationRepository;
     private final LoanRepository loanRepository;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CustomerAccountControllerTest(MockMvc mockMvc,
-                                         CustomerRepository customerRepository,
-                                         AccountRepository accountRepository,
-                                         TransactionRepository transactionRepository,
-                                         EmployeeRepository employeeRepository,
-                                         LoanRepository loanRepository,
-                                         PasswordEncoder passwordEncoder,
-                                         ObjectMapper objectMapper){
+    public CustomerAccountTests(MockMvc mockMvc,
+                                CustomerRepository customerRepository,
+                                AccountRepository accountRepository,
+                                TransactionRepository transactionRepository,
+                                EmployeeRepository employeeRepository,
+                                NotificationRepository notificationRepository,
+                                LoanRepository loanRepository,
+                                PasswordEncoder passwordEncoder,
+                                ObjectMapper objectMapper){
         this.mockMvc = mockMvc;
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.employeeRepository = employeeRepository;
+        this.notificationRepository = notificationRepository;
         this.loanRepository = loanRepository;
         this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
@@ -480,6 +486,9 @@ public class CustomerAccountControllerTest {
                 .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
                 .andExpect(jsonPath("$.balance").value("0"))
                 .andExpect(jsonPath("$.accountStatus").value("ACTIVE"));
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
@@ -577,6 +586,9 @@ public class CustomerAccountControllerTest {
 
         Account updatedAccount = accountRepository.findById(account.getId()).orElseThrow();
         assertEquals(AccountStatus.CLOSED, updatedAccount.getAccountStatus());
+
+        Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
+        assertEquals(1, notificationRepository.findAll(specs).size());
     }
 
     @Test
