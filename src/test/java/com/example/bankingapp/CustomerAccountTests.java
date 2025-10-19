@@ -100,8 +100,8 @@ public class CustomerAccountTests {
     }
 
     private Employee createEmployee(int num){
-        String i = "" + num;
-        if(num < 100) i = "0" + num;
+        String i = "0" + num;
+        if(num >= 100) i = "" + num;
         Employee employee = new Employee();
         employee.setName("Parth " + i + " William");
         employee.setUsername("parth1" + i + "23");
@@ -175,7 +175,7 @@ public class CustomerAccountTests {
         mockMvc.perform(get("/api/customer/accounts")
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -231,7 +231,7 @@ public class CustomerAccountTests {
         mockMvc.perform(get("/api/customer/accounts/{accountId}", account.getId())
                 .with(user("IDONotExist").roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -352,7 +352,7 @@ public class CustomerAccountTests {
         mockMvc.perform(get("/api/customer/accounts/{accountId}/transactions", account.getId())
                 .with(user("IDoNotExist").roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -414,7 +414,7 @@ public class CustomerAccountTests {
         mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
                 .with(user("IDoNotExist").roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -463,7 +463,7 @@ public class CustomerAccountTests {
         mockMvc.perform(get("/api/customer/accounts/{accountId}/balance", account.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."))
+                .andExpect(jsonPath("$.message").value("Account not active."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -504,7 +504,7 @@ public class CustomerAccountTests {
                 .contentType("application/json")
                 .content(requestBody))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -553,7 +553,7 @@ public class CustomerAccountTests {
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."));
+                .andExpect(jsonPath("$.message").value("Account not active."));
     }
 
     @Test
@@ -602,7 +602,7 @@ public class CustomerAccountTests {
         mockMvc.perform(post("/api/customer/accounts/{accountId}/close", account.getId())
                 .with(user("IDoNotExist").roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 

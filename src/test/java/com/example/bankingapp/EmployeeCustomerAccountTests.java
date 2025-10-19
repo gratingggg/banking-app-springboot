@@ -207,7 +207,7 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -406,7 +406,7 @@ public class EmployeeCustomerAccountTests {
                         .content(requestBody)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -543,7 +543,7 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."))
+                .andExpect(jsonPath("$.message").value("Account not active."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -836,7 +836,7 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Customer not found"))
+                .andExpect(jsonPath("$.message").value("Customer not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
@@ -1015,7 +1015,7 @@ public class EmployeeCustomerAccountTests {
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."))
+                .andExpect(jsonPath("$.message").value("Account not active."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -1034,7 +1034,7 @@ public class EmployeeCustomerAccountTests {
                         .param("fund", "-2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Transaction amount is invalid. Please enter a positive amount."))
+                .andExpect(jsonPath("$.message").value("Entered amount is invalid. Please enter a positive amount."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -1196,7 +1196,7 @@ public class EmployeeCustomerAccountTests {
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Your account is currently not active."))
+                .andExpect(jsonPath("$.message").value("Account not active."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -1216,7 +1216,7 @@ public class EmployeeCustomerAccountTests {
                         .param("fund", "-2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Transaction amount is invalid. Please enter a positive amount."))
+                .andExpect(jsonPath("$.message").value("Entered amount is invalid. Please enter a positive amount."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 

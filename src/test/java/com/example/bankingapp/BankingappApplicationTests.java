@@ -12,5 +12,5 @@ class BankingappApplicationTests {
 
 }
 
-// Customer No = 113 done, start from 114
-// Employee no = 64 done, start from 65
+// Customer No = 222 done, start from 223
+// Employee no = 97 done, start from 98

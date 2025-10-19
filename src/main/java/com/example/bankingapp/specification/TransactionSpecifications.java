@@ -1,6 +1,7 @@
 package com.example.bankingapp.specification;
 
 import com.example.bankingapp.entities.account.Account;
+import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
@@ -36,6 +37,10 @@ public class TransactionSpecifications {
 
     public static Specification<Transaction> forToAccounts(Account toAccount){
         return (root, query, builder)-> builder.equal(root.get("toAccount"), toAccount);
+    }
+
+    public static Specification<Transaction> forLoan(Loan loan){
+        return (root, query, builder) -> builder.equal(root.get("loan"), loan);
     }
 
     public static Specification<Transaction> withStatus(TransactionStatus status){

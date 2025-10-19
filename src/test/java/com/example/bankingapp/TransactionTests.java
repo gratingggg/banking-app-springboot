@@ -94,6 +94,7 @@ public class TransactionTests {
 
     private Employee createEmployee(int num) {
         String i = "0" + num;
+        if (num >= 100) i = "" + num;
         Employee employee = new Employee();
         employee.setName("Parth " + i + " William");
         employee.setUsername("parth1" + i + "23");
@@ -357,7 +358,7 @@ public class TransactionTests {
                         .contentType("application/json")
                         .content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(("Transaction amount is invalid. Please enter a positive amount.")))
+                .andExpect(jsonPath("$.message").value(("Entered amount is invalid. Please enter a positive amount.")))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 
@@ -835,7 +836,7 @@ public class TransactionTests {
                         .contentType("application/json")
                         .content(request))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Transaction amount is invalid. Please enter a positive amount."))
+                .andExpect(jsonPath("$.message").value("Entered amount is invalid. Please enter a positive amount."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.BAD_REQUEST.value()));
     }
 

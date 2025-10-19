@@ -10,6 +10,6 @@ public class AccountNotActiveException extends RuntimeException {
     }
 
     public AccountNotActiveException() {
-        super("Your account is currently not active.");
+        super("Account not active.");
     }
 }

@@ -1,5 +1,6 @@
 package com.example.bankingapp.dto.loan;
 
+import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.loan.LoanStatus;
 import com.example.bankingapp.entities.loan.LoanType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -9,6 +10,8 @@ import java.time.LocalDate;
 
 public class LoanResponseDTO {
     private Long accountId;
+
+    private Long loanId;
 
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfIssuance;
@@ -25,12 +28,43 @@ public class LoanResponseDTO {
 
     private BigDecimal rateOfInterest;
 
+    private BigDecimal emi;
+
+    public LoanResponseDTO(Loan loan){
+        accountId = loan.getAccount().getId();
+        loanId = loan.getId();
+        dateOfIssuance = loan.getDateOfIssuance();
+        tenureInMonths = loan.getTenureInMonths();
+        dateOfRepayment = loan.getDateOfRepayment();
+        loanType = loan.getLoanType();
+        loanStatus = loan.getLoanStatus();
+        principalAmount = loan.getPrincipalAmount();
+        rateOfInterest = loan.getRateOfInterest();
+        emi = loan.calculateEMI();
+    }
+
+    public BigDecimal getEmi() {
+        return emi;
+    }
+
+    public void setEmi(BigDecimal emi) {
+        this.emi = emi;
+    }
+
     public Long getAccountId() {
         return accountId;
     }
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
+    }
+
+    public Long getLoanId() {
+        return loanId;
+    }
+
+    public void setLoanId(Long loanId) {
+        this.loanId = loanId;
     }
 
     public LocalDate getDateOfIssuance() {

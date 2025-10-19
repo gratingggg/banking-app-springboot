@@ -58,7 +58,7 @@ public class TransactionService {
             throw new SameAccountTransactionException();
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new TransactionAmountInvalidException();
+            throw new AmountInvalidException();
         }
     }
 

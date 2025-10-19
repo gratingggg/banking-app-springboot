@@ -1,5 +1,6 @@
 package com.example.bankingapp.dto.transaction;
 
+import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -28,6 +29,20 @@ public class TransactionResponseDTO {
     private String failureReason;
 
     private String handledBy;
+
+    public TransactionResponseDTO(){}
+
+    public TransactionResponseDTO(Transaction transaction){
+        if(transaction.getFromAccount() != null) setFromAccountId(transaction.getFromAccount().getId());
+        if (transaction.getToAccount() != null) setToAccountId(transaction.getToAccount().getId());
+        setTransactionId(transaction.getId());
+        setAmount(transaction.getAmount());
+        setDateOfTransaction(transaction.getDateOfTransaction());
+        if (transaction.getLoan() != null) setLoanId(transaction.getLoan().getId());
+        setTransactionStatus(transaction.getTransactionStatus());
+        setTransactionType(transaction.getTransactionType());
+        setFailureReason(transaction.getFailureReason());
+    }
 
     public String getHandledBy() {
         return handledBy;

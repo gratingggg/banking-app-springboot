@@ -25,7 +25,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({AadharNumberAlreadyExistsException.class, UsernameAlreadyExistsException.class,
             EmailAlreadyExistsException.class, PhoneNumberAlreadyExistsException.class,
-            AccountDuplicationException.class})
+            AccountDuplicationException.class, LoanOverdueException.class})
     public ResponseEntity<Object> handleAlreadyExists(Exception ex){
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.CONFLICT.value()));
@@ -47,15 +47,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({AccountAccessDeniedException.class, TransactionAccessDeniedException.class,
-            NotificationAccessDeniedException.class})
+            NotificationAccessDeniedException.class, LoanAccessDeniedException.class})
     public ResponseEntity<Object> handleAccountAccessDeniedException(Exception ex){
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler({AccountBalanceNotZeroException.class, AccountNotActiveException.class,
-            TransactionAmountInvalidException.class, NonClosedLoanException.class,
-            SameAccountTransactionException.class})
+            AmountInvalidException.class, NonClosedLoanException.class,
+            SameAccountTransactionException.class, LoanNotActiveException.class,
+            IllegalArgumentException.class, LoanNotDisbursedException.class})
     public ResponseEntity<Object> handleAccountBalanceNotZero(Exception ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value()));

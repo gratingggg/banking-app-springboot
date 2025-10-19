@@ -1,8 +1,8 @@
 package com.example.bankingapp.entities.loan;
 
 import com.example.bankingapp.entities.account.Account;
-import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
+import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.transaction.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -14,8 +14,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "loans")
@@ -25,8 +24,7 @@ public class Loan extends BaseEntity {
     @NotNull(message = "account cannot be null")
     private Account account;
 
-    @Column(name = "issuance_date", nullable = false)
-    @NotNull(message = "issuance date cannot be null")
+    @Column(name = "issuance_date")
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfIssuance;
 
@@ -59,8 +57,7 @@ public class Loan extends BaseEntity {
     private final Set<Transaction> transactions = new LinkedHashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    @NotNull(message = "Employee cannot be null.")
+    @JoinColumn(name = "employee_id")
     private Employee approvedBy;
 
     public Account getAccount() {
@@ -153,34 +150,60 @@ public class Loan extends BaseEntity {
     }
 
     public boolean isOverdue(){
-        if((loanStatus == LoanStatus.DEFAULTED) ||
-                (loanStatus == LoanStatus.DISBURSED && LocalDate.now().isAfter(dateOfRepayment))){
-            return true;
+        LocalDate repaymentDate = getDateOfRepayment();
+        if(repaymentDate == null){
+            return false;
         }
-        return false;
+        return (loanStatus == LoanStatus.DEFAULTED) ||
+                (loanStatus == LoanStatus.DISBURSED && LocalDate.now().isAfter(repaymentDate));
     }
 
     public BigDecimal getOutstandingAmount(){
-        long totalMonths = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
-
         BigDecimal monthlyRate = rateOfInterest.divide(BigDecimal.valueOf(1200), MathContext.DECIMAL128);
-        BigDecimal outstanding = principalAmount.multiply(
-            monthlyRate.add(BigDecimal.ONE).pow((int) totalMonths, MathContext.DECIMAL128)
-        );
-
         BigDecimal emi = calculateEMI();
-        if(isOverdue()){
-            BigDecimal penalty = emi.multiply(BigDecimal.valueOf(0.02));
-            outstanding = outstanding.add(penalty);
-        }
+        BigDecimal balance = principalAmount;
 
-        for (Transaction transaction : getTransactions()){
-            if(transaction.isCredit()){
-                outstanding = outstanding.subtract(transaction.getAmount());
+        Map<Integer, BigDecimal> paymentsByMonth = getPaymentsByMonth();
+        long monthsElapsed = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
+
+        for (int month = 1; month <= monthsElapsed; month++) {
+            BigDecimal interest = balance.multiply(monthlyRate);
+            balance = balance.add(interest);
+
+            BigDecimal payment = paymentsByMonth.getOrDefault(month, BigDecimal.ZERO);
+            balance = balance.subtract(payment);
+
+            if (month <= tenureInMonths && payment.compareTo(emi) < 0) {
+                BigDecimal shortfall = emi.subtract(payment);
+                BigDecimal penalty = shortfall.multiply(BigDecimal.valueOf(0.02));
+                balance = balance.add(penalty);
             }
         }
 
-        return outstanding;
+        return balance.max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private Map<Integer, BigDecimal> getPaymentsByMonth() {
+        Map<Integer, BigDecimal> paymentsByMonth = new HashMap<>();
+
+        List<Transaction> sortedTransactions = transactions.stream()
+                .filter(Transaction::isDebit)
+                .sorted(Comparator.comparing(Transaction::getDateOfTransaction))
+                .toList();
+
+        for (Transaction transaction : sortedTransactions) {
+            long monthNumber = Period.between(dateOfIssuance, transaction.getDateOfTransaction().toLocalDate()).toTotalMonths() + 1;
+
+            if(monthNumber > 0) {
+                paymentsByMonth.merge(
+                        (int) monthNumber,
+                        transaction.getAmount(),
+                        BigDecimal::add
+                );
+            }
+        }
+
+        return paymentsByMonth;
     }
 
     public BigDecimal calculateEMI(){

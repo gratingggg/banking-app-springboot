@@ -65,21 +65,6 @@ public class AccountService {
         return responseDTO;
     }
 
-    private TransactionResponseDTO transactionToDto(Transaction transaction){
-        TransactionResponseDTO dto = new TransactionResponseDTO();
-        if(transaction.getFromAccount() != null) dto.setFromAccountId(transaction.getFromAccount().getId());
-        if (transaction.getToAccount() != null) dto.setToAccountId(transaction.getToAccount().getId());
-        dto.setTransactionId(transaction.getId());
-        dto.setAmount(transaction.getAmount());
-        dto.setDateOfTransaction(transaction.getDateOfTransaction());
-        if (transaction.getLoan() != null) dto.setLoanId(transaction.getLoan().getId());
-        dto.setTransactionStatus(transaction.getTransactionStatus());
-        dto.setTransactionType(transaction.getTransactionType());
-        dto.setFailureReason(transaction.getFailureReason());
-
-        return dto;
-    }
-
     private List<AccountSummaryDTO> getAllAccounts(Customer customer){
         List<AccountSummaryDTO> listOfDtos = new ArrayList<>();
         for(Account account : customer.getAccounts()){
@@ -134,7 +119,7 @@ public class AccountService {
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));;
         Page<Transaction> pageDto = transactionRepository.findAll(specification, pageable);
 
-        return pageDto.map(this::transactionToDto);
+        return pageDto.map(TransactionResponseDTO::new);
     }
 
     private AccountBalanceResponseDTO getBalance(Account account){
@@ -151,7 +136,7 @@ public class AccountService {
             throw new AccountNotActiveException();
         }
         if(fund.compareTo(BigDecimal.ZERO) < 1){
-            throw new TransactionAmountInvalidException();
+            throw new AmountInvalidException();
         }
     }
 
@@ -298,7 +283,7 @@ public class AccountService {
                 .and(TransactionSpecifications.withType(type))
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));
         Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-        return transactions.map(this::transactionToDto);
+        return transactions.map(TransactionResponseDTO::new);
     }
 
     @Transactional
@@ -343,7 +328,7 @@ public class AccountService {
         if(!message.isBlank()){
             notificationService.createNotification(account.getCustomer(), NotificationType.TRANSACTION, message);
         }
-        return transactionToDto(transaction);
+        return new TransactionResponseDTO(transaction);
     }
 
     @Transactional
@@ -391,6 +376,6 @@ public class AccountService {
             notificationService.createNotification(account.getCustomer(), NotificationType.TRANSACTION, message);
         }
 
-        return transactionToDto(transaction);
+        return new TransactionResponseDTO(transaction);
     }
 }
