@@ -33,8 +33,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("home/customer/**").permitAll()
-                        .requestMatchers("home/employee/**").permitAll()
+                        .requestMatchers("/home/customer/**").permitAll()
+                        .requestMatchers("/home/employee/**").permitAll()
                         .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
                         .anyRequest().authenticated())

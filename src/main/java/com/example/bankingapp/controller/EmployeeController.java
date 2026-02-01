@@ -2,19 +2,22 @@ package com.example.bankingapp.controller;
 
 import com.example.bankingapp.dto.employee.EmployeeLoginDTO;
 import com.example.bankingapp.dto.employee.EmployeeResponseDTO;
+import com.example.bankingapp.dto.loan.LoanResponseDTO;
+import com.example.bankingapp.entities.loan.Loan;
+import com.example.bankingapp.entities.loan.LoanType;
 import com.example.bankingapp.service.EmployeeService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("home/employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -51,9 +54,26 @@ public class EmployeeController {
         return form;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/home/employee/login")
     public ResponseEntity<EmployeeResponseDTO> processEmployeeLogin(@Valid @RequestBody EmployeeLoginDTO employeeLoginDTO){
         EmployeeResponseDTO employeeResponseDTO = employeeService.processEmployeeLogin(employeeLoginDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(employeeResponseDTO);
+        return ResponseEntity.ok(employeeResponseDTO);
+    }
+
+    @GetMapping("/api/employee/loans/pending")
+    public ResponseEntity<Page<Loan>> getPendingLoans(@RequestParam(required = false, defaultValue = "0") int page,
+                                                      @RequestParam(required = false, defaultValue = "10") int size,
+                                                      @RequestParam(required = false) LoanType type,
+                                                      Principal principal){
+        Page<Loan> loans = employeeService.getPendingLoans(page, size, type, principal.getName());
+        return ResponseEntity.ok(loans);
+    }
+
+    @PostMapping("/api/employee/loans/{loanId}/process")
+    public ResponseEntity<LoanResponseDTO> processLoan(@PathVariable Long loanId,
+                                                       String action,
+                                                       Principal principal){
+        LoanResponseDTO loanResponseDTO = employeeService.processLoan(loanId, action, principal.getName());
+        return ResponseEntity.ok(loanResponseDTO);
     }
 }

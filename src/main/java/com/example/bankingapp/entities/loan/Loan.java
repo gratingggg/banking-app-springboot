@@ -58,7 +58,7 @@ public class Loan extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
-    private Employee approvedBy;
+    private Employee handledBy;
 
     public Account getAccount() {
         return account;
@@ -137,12 +137,12 @@ public class Loan extends BaseEntity {
     }
 
     public Employee getApprovedBy() {
-        return approvedBy;
+        return handledBy;
     }
 
     public void setApprovedBy(Employee approvedBy) {
         this.loanStatus = LoanStatus.APPROVED;
-        this.approvedBy = approvedBy;
+        this.handledBy = approvedBy;
     }
 
     public void rejected(){

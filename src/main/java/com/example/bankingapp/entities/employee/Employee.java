@@ -28,8 +28,8 @@ public class Employee extends Person {
     @NotNull(message = "Role cannot be blank")
     private Role role = Role.EMPLOYEE;
 
-    @OneToMany(mappedBy = "approvedBy")
-    private final Set<Loan> approvedLoans = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "handledBy")
+    private final Set<Loan> handledLoans = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "handledBy")
     private final Set<Transaction> handledTransactions = new LinkedHashSet<>();
@@ -59,7 +59,7 @@ public class Employee extends Person {
     }
 
     public Set<Loan> getApprovedLoans() {
-        return approvedLoans;
+        return handledLoans;
     }
 
     public Set<Transaction> getHandledTransactions() {
@@ -67,7 +67,7 @@ public class Employee extends Person {
     }
 
     public void addApprovedLoan(Loan loan){
-        approvedLoans.add(loan);
+        handledLoans.add(loan);
         loan.setApprovedBy(this);
     }
 

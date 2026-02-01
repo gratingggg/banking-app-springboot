@@ -91,8 +91,7 @@ public class EmployeeLoginTests {
         employeeRepository.save(employee);
         EmployeeLoginDTO dto = createEmployeeLoginDTO(10);
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -106,13 +105,11 @@ public class EmployeeLoginTests {
         EmployeeLoginDTO dto = createEmployeeLoginDTO(11);
         dto.setUsername("rudra");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("The employee with the username " + dto.getUsername() + " does not exist." +
-                        "Please enter the valid username."))
+                .andExpect(jsonPath("$.message").value("Invalid username or password."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
     }
 
@@ -123,12 +120,11 @@ public class EmployeeLoginTests {
         EmployeeLoginDTO dto = createEmployeeLoginDTO(12);
         dto.setPassword("secret");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("Password do not match. Please enter the correct password."))
+                .andExpect(jsonPath("$.message").value("Invalid username or password."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
     }
 
@@ -139,8 +135,7 @@ public class EmployeeLoginTests {
         EmployeeLoginDTO dto = createEmployeeLoginDTO(13);
         dto.setUsername("");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -154,8 +149,7 @@ public class EmployeeLoginTests {
         EmployeeLoginDTO dto = createEmployeeLoginDTO(14);
         dto.setPassword("");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -169,8 +163,7 @@ public class EmployeeLoginTests {
         employeeRepository.save(employee);
         EmployeeLoginDTO dto = createEmployeeLoginDTO(15);
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc
-                .perform(post("/home/employee/login")
+        mockMvc.perform(post("/home/employee/login")
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())

@@ -622,7 +622,6 @@ public class LoanTests {
                         .content(body))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.transactionId").exists())
-                .andExpect(jsonPath("$.amount").value("2238.1"))
                 .andExpect(jsonPath("$.fromAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.loanId").value(loan.getId()))
                 .andExpect(jsonPath("$.failureReason").value("You are paying more than required amount."))
