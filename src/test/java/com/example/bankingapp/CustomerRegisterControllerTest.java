@@ -4,6 +4,7 @@ import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.repository.CustomerRepository;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,7 @@ public class CustomerRegisterControllerTest {
         CustomerRequestDTO customer = createCustomerRequestDTO(10);
         String requestBody = objectMapper.writeValueAsString(customer);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isCreated())
@@ -116,7 +117,7 @@ public class CustomerRegisterControllerTest {
 
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -135,7 +136,7 @@ public class CustomerRegisterControllerTest {
         dto.setPhoneNumber("abc12#4231");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -148,7 +149,7 @@ public class CustomerRegisterControllerTest {
         dto.setEmail("abdslksjgasdfa");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -163,7 +164,7 @@ public class CustomerRegisterControllerTest {
         dto.setEmail(customer.getEmail());
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isConflict())
@@ -179,7 +180,7 @@ public class CustomerRegisterControllerTest {
         dto.setPhoneNumber(customer.getPhoneNumber());
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isConflict())
@@ -194,7 +195,7 @@ public class CustomerRegisterControllerTest {
         dto.setAadharNo(customer.getAadharNo());
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isConflict())
@@ -210,7 +211,7 @@ public class CustomerRegisterControllerTest {
         dto.setUsername(customer.getUsername());
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isConflict())
@@ -224,7 +225,7 @@ public class CustomerRegisterControllerTest {
         String requestBody = objectMapper.writeValueAsString(dto);
         requestBody = requestBody.replace("\"MALE\"", "\"INVALID\"");
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -237,7 +238,7 @@ public class CustomerRegisterControllerTest {
         dto.setDateOfBirth(LocalDate.of(2026, 8, 8));
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/register")
+                .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())

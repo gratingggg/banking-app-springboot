@@ -1,6 +1,6 @@
 package com.example.bankingapp.service;
 
-import com.example.bankingapp.dto.customer.CustomerLoginDTO;
+import com.example.bankingapp.dto.customer.CustomerLoginRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerResponseDTO;
 import com.example.bankingapp.entities.customer.Customer;
@@ -93,7 +93,7 @@ public class CustomerService {
         return mapCustomerToDTO(customer);
     }
 
-    public CustomerResponseDTO processCustomerLogin(CustomerLoginDTO customerLoginDTO) {
+    public CustomerResponseDTO processCustomerLogin(CustomerLoginRequestDTO customerLoginDTO) {
         Customer customer = customerRepository.findByUsername(customerLoginDTO.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("The customer with the username " + customerLoginDTO.getUsername() + " does not exist." +
                         "Please enter the valid username."));

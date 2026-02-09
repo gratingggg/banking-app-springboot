@@ -1,6 +1,6 @@
 package com.example.bankingapp.service;
 
-import com.example.bankingapp.dto.employee.EmployeeLoginDTO;
+import com.example.bankingapp.dto.employee.EmployeeLoginRequestDTO;
 import com.example.bankingapp.dto.employee.EmployeeResponseDTO;
 import com.example.bankingapp.dto.loan.LoanResponseDTO;
 import com.example.bankingapp.entities.employee.Employee;
@@ -58,7 +58,7 @@ public class EmployeeService {
         return employee;
     }
 
-    public EmployeeResponseDTO processEmployeeLogin(EmployeeLoginDTO employeeLoginDTO) {
+    public EmployeeResponseDTO processEmployeeLogin(EmployeeLoginRequestDTO employeeLoginDTO) {
 
         Employee employee = employeeRepository.findByUsername(employeeLoginDTO.getUsername())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid username or password."));

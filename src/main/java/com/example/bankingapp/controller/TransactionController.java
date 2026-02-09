@@ -3,6 +3,7 @@ package com.example.bankingapp.controller;
 import com.example.bankingapp.dto.transaction.TransactionRequestDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
 import com.example.bankingapp.service.TransactionService;
+import com.example.bankingapp.utils.Endpoints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +13,6 @@ import java.net.URI;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api")
 public class TransactionController {
     private final TransactionService transactionService;
 
@@ -21,7 +21,7 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @PostMapping("customer/transactions/transfer")
+    @PostMapping(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
     public ResponseEntity<TransactionResponseDTO> transferFund(@RequestBody TransactionRequestDTO requestDTO,
                                                                Principal principal){
         TransactionResponseDTO responseDTO = transactionService.transferFund(requestDTO.getFromAccountId(),
@@ -30,14 +30,14 @@ public class TransactionController {
         return ResponseEntity.created(location).body(responseDTO);
     }
 
-    @GetMapping("customer/transactions/{transactionId}")
+    @GetMapping(Endpoints.TRANSACTION_CUSTOMER)
     public ResponseEntity<TransactionResponseDTO> getTransaction(@PathVariable Long transactionId, Principal principal){
         TransactionResponseDTO responseDTO = transactionService.getTransaction(transactionId, principal.getName());
         return ResponseEntity.ok(responseDTO);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @PostMapping("employee/transactions/transfer")
+    @PostMapping(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
     public ResponseEntity<TransactionResponseDTO> transferFundByEmployee(@RequestBody TransactionRequestDTO requestDTO,
                                                                Principal principal){
         TransactionResponseDTO responseDTO = transactionService.transferFundByEmployee(requestDTO.getFromAccountId(),
@@ -47,7 +47,7 @@ public class TransactionController {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping("employee/transactions/{transactionId}")
+    @GetMapping(Endpoints.TRANSACTION_EMPLOYEE)
     public ResponseEntity<TransactionResponseDTO> getTransactionByEmployee(@PathVariable Long transactionId, Principal principal){
         TransactionResponseDTO responseDTO = transactionService.getTransactionByEmployee(transactionId, principal.getName());
         return ResponseEntity.ok(responseDTO);

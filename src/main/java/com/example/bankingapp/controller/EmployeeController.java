@@ -1,11 +1,12 @@
 package com.example.bankingapp.controller;
 
-import com.example.bankingapp.dto.employee.EmployeeLoginDTO;
+import com.example.bankingapp.dto.employee.EmployeeLoginRequestDTO;
 import com.example.bankingapp.dto.employee.EmployeeResponseDTO;
 import com.example.bankingapp.dto.loan.LoanResponseDTO;
 import com.example.bankingapp.entities.loan.Loan;
 import com.example.bankingapp.entities.loan.LoanType;
 import com.example.bankingapp.service.EmployeeService;
+import com.example.bankingapp.utils.Endpoints;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -54,13 +55,13 @@ public class EmployeeController {
         return form;
     }
 
-    @PostMapping("/home/employee/login")
-    public ResponseEntity<EmployeeResponseDTO> processEmployeeLogin(@Valid @RequestBody EmployeeLoginDTO employeeLoginDTO){
+    @PostMapping(Endpoints.EMPLOYEE_ME)
+    public ResponseEntity<EmployeeResponseDTO> processEmployeeLogin(@Valid @RequestBody EmployeeLoginRequestDTO employeeLoginDTO){
         EmployeeResponseDTO employeeResponseDTO = employeeService.processEmployeeLogin(employeeLoginDTO);
         return ResponseEntity.ok(employeeResponseDTO);
     }
 
-    @GetMapping("/api/employee/loans/pending")
+    @GetMapping(Endpoints.EMPLOYEE_LOANS_PENDING)
     public ResponseEntity<Page<Loan>> getPendingLoans(@RequestParam(required = false, defaultValue = "0") int page,
                                                       @RequestParam(required = false, defaultValue = "10") int size,
                                                       @RequestParam(required = false) LoanType type,
@@ -69,7 +70,7 @@ public class EmployeeController {
         return ResponseEntity.ok(loans);
     }
 
-    @PostMapping("/api/employee/loans/{loanId}/process")
+    @PostMapping(Endpoints.EMPLOYEE_LOANS_PROCESS)
     public ResponseEntity<LoanResponseDTO> processLoan(@PathVariable Long loanId,
                                                        String action,
                                                        Principal principal){

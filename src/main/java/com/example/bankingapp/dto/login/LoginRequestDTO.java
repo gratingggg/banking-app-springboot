@@ -1,8 +1,8 @@
-package com.example.bankingapp.dto.employee;
+package com.example.bankingapp.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class EmployeeLoginDTO {
+public class LoginRequestDTO {
     @NotBlank(message = "Username cannot be blank.")
     private String username;
 

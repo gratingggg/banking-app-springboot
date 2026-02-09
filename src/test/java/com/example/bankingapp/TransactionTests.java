@@ -15,6 +15,7 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -182,7 +183,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user("IDoNotExist").roles(toCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -207,7 +208,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -232,7 +233,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -257,7 +258,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -282,7 +283,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -307,7 +308,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -328,7 +329,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, fromAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -353,7 +354,7 @@ public class TransactionTests {
         requestDTO.setAmount(BigDecimal.valueOf(-345));
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -377,7 +378,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -409,7 +410,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_CUSTOMER_TRANSFER)
                         .with(user(fromCustomer.getUsername()).roles(fromCustomer.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -431,7 +432,7 @@ public class TransactionTests {
         accountRepository.save(account);
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/customer/transactions/" + transaction.getId())
+        mockMvc.perform(get(Endpoints.TRANSACTION_CUSTOMER, transaction.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.transactionId").value(transaction.getId()))
@@ -446,7 +447,7 @@ public class TransactionTests {
         customer.setId(99999999L);
         customer.setUsername("IDoNotExist");
 
-        mockMvc.perform(get("/api/customer/transactions/" + 23487265987345L)
+        mockMvc.perform(get(Endpoints.TRANSACTION_CUSTOMER, 23487265987345L)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("The customer with username " + customer.getUsername() + " not found."))
@@ -458,7 +459,7 @@ public class TransactionTests {
         Customer customer = createCustomer(136);
         customerRepository.save(customer);
 
-        mockMvc.perform(get("/api/customer/transactions/" + 23487265987345L)
+        mockMvc.perform(get(Endpoints.TRANSACTION_CUSTOMER, 23487265987345L)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Transaction not found."))
@@ -484,7 +485,7 @@ public class TransactionTests {
         accountRepository.saveAll(List.of(fromAccount, toAccount));
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/customer/transactions/" + transaction.getId())
+        mockMvc.perform(get(Endpoints.TRANSACTION_CUSTOMER, transaction.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are trying to access someone else's transaction."))
@@ -511,7 +512,7 @@ public class TransactionTests {
         Employee employee = createEmployee(65);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/transactions/" + transaction.getId())
+        mockMvc.perform(get(Endpoints.TRANSACTION_EMPLOYEE, transaction.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.transactionId").value(transaction.getId()))
@@ -523,14 +524,14 @@ public class TransactionTests {
 
     @Test
     public void whenGetTransactionByEmployee_WrongRole_ThenForbidden() throws Exception {
-        mockMvc.perform(get("/api/employee/transactions/1")
+        mockMvc.perform(get(Endpoints.TRANSACTION_EMPLOYEE, 1)
                         .with(user("IAmWrongRole").roles("CUSTOMER")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     public void whenGetTransactionByEmployee_InvalidEmployee_ThenNotFound() throws Exception {
-        mockMvc.perform(get("/api/employee/transactions/1")
+        mockMvc.perform(get(Endpoints.TRANSACTION_EMPLOYEE, 1)
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee with username IDoNotExist not found."))
@@ -543,7 +544,7 @@ public class TransactionTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/transactions/3")
+        mockMvc.perform(get(Endpoints.TRANSACTION_EMPLOYEE, 3)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -555,7 +556,7 @@ public class TransactionTests {
         Employee employee = createEmployee(67);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/transactions/999999999")
+        mockMvc.perform(get(Endpoints.TRANSACTION_EMPLOYEE, 999999999)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Transaction not found."))
@@ -580,7 +581,7 @@ public class TransactionTests {
         Employee employee = createEmployee(68);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -618,7 +619,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user("IAmWrongRole").roles("CUSTOMER"))
                         .contentType("application/json")
                         .content(request))
@@ -640,7 +641,7 @@ public class TransactionTests {
         TransactionRequestDTO requestDTO = createTransactionRequestDTO(fromAccount, toAccount);
         String request = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user("IDoNotExist").roles("EMPLOYEE"))
                         .contentType("application/json")
                         .content(request))
@@ -668,7 +669,7 @@ public class TransactionTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -696,7 +697,7 @@ public class TransactionTests {
         Employee employee = createEmployee(70);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -723,7 +724,7 @@ public class TransactionTests {
         Employee employee = createEmployee(71);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -751,7 +752,7 @@ public class TransactionTests {
         Employee employee = createEmployee(72);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -779,7 +780,7 @@ public class TransactionTests {
         Employee employee = createEmployee(73);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -803,7 +804,7 @@ public class TransactionTests {
         Employee employee = createEmployee(74);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -831,7 +832,7 @@ public class TransactionTests {
         Employee employee = createEmployee(75);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -858,7 +859,7 @@ public class TransactionTests {
         Employee employee = createEmployee(76);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))
@@ -894,7 +895,7 @@ public class TransactionTests {
         Employee employee = createEmployee(77);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/transactions/transfer")
+        mockMvc.perform(post(Endpoints.TRANSACTIONS_EMPLOYEE_TRANSFER)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(request))

@@ -18,6 +18,7 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +142,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(18);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].accountId").value(account.getId()))
@@ -158,7 +159,7 @@ public class EmployeeCustomerAccountTests {
 
         Customer customer1 = createCustomer(46);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -171,7 +172,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -190,7 +191,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -204,7 +205,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(20);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Customer not found."))
@@ -219,7 +220,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(22);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNTS_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk());
     }
@@ -235,7 +236,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(23);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_PARTICULAR, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
@@ -255,7 +256,7 @@ public class EmployeeCustomerAccountTests {
         accountRepository.save(account);
 
         Customer customer1 = createCustomer(52);
-        mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_PARTICULAR, account.getId())
                         .with(user(customer1.getUsername()).roles(customer1.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -267,7 +268,7 @@ public class EmployeeCustomerAccountTests {
         customer.addAccount(account);
         customerRepository.save(customer);
         accountRepository.save(account);
-        mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_PARTICULAR, account.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -286,7 +287,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_PARTICULAR, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -301,7 +302,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(25);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_PARTICULAR, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Account not found."))
@@ -320,7 +321,7 @@ public class EmployeeCustomerAccountTests {
         requestDTO.setAccountType(AccountType.SAVINGS);
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -341,7 +342,7 @@ public class EmployeeCustomerAccountTests {
         requestDTO.setAccountType(AccountType.SAVINGS);
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
@@ -357,7 +358,7 @@ public class EmployeeCustomerAccountTests {
         requestDTO.setAccountType(AccountType.SAVINGS);
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
@@ -379,7 +380,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -401,7 +402,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(28);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -425,7 +426,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(29);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/customer/{customerId}/accounts", customer.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_CREATE, customer.getId())
                         .contentType("application/json")
                         .content(requestBody)
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -445,7 +446,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(30);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(status().isOk())
@@ -471,7 +472,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(31);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -484,7 +485,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -503,7 +504,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -521,7 +522,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(33);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Account not found."))
@@ -540,7 +541,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(34);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Account not active."))
@@ -567,7 +568,7 @@ public class EmployeeCustomerAccountTests {
         employeeRepository.save(employee);
         loanRepository.save(loan);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("You currently have active loan. Please clear them before deleting the account."))
@@ -586,7 +587,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(36);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/close", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DELETE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Account balance is not zero. Please withdraw the remaining money before deleting the account."))
@@ -615,7 +616,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(37);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction.getId()))
@@ -640,7 +641,7 @@ public class EmployeeCustomerAccountTests {
         accountRepository.save(account);
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -656,7 +657,7 @@ public class EmployeeCustomerAccountTests {
         accountRepository.save(account);
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -678,7 +679,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -692,7 +693,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(38);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Account not found."))
@@ -710,7 +711,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(39);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk());
     }
@@ -732,7 +733,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(40);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/transactions", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .param("page", "2")
                         .param("size", "3")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -763,7 +764,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(41);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
@@ -781,7 +782,7 @@ public class EmployeeCustomerAccountTests {
         accountRepository.save(account);
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -797,7 +798,7 @@ public class EmployeeCustomerAccountTests {
         accountRepository.save(account);
         transactionRepository.save(transaction);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -819,7 +820,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -833,7 +834,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(43);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Customer not found."))
@@ -862,7 +863,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(44);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .param("page", "2")
                         .param("size", "3")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
@@ -883,7 +884,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(45);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/accounts/transactions", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk());
     }
@@ -899,7 +900,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(46);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
@@ -926,7 +927,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
@@ -940,7 +941,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
@@ -960,7 +961,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
@@ -975,7 +976,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(48);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
@@ -994,7 +995,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(49);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest());
     }
@@ -1011,7 +1012,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(50);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
@@ -1030,7 +1031,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(51);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "-2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
@@ -1053,7 +1054,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(52);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/deposit", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
@@ -1075,7 +1076,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(53);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
@@ -1103,7 +1104,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
@@ -1118,7 +1119,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
@@ -1139,7 +1140,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
@@ -1154,7 +1155,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(55);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
@@ -1174,7 +1175,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(56);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest());
     }
@@ -1192,7 +1193,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(57);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
@@ -1212,7 +1213,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(58);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "-2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isBadRequest())
@@ -1237,7 +1238,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(59);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "2000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
@@ -1259,7 +1260,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(60);
         employeeRepository.save(employee);
 
-        mockMvc.perform(post("/api/employee/accounts/{accountId}/withdrawal", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL, account.getId())
                         .param("fund", "7000")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isCreated())
@@ -1279,7 +1280,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(62);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_BALANCE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(5000.0));
@@ -1294,7 +1295,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_BALANCE, account.getId())
                         .with(user("IAmWrongRole").roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -1308,7 +1309,7 @@ public class EmployeeCustomerAccountTests {
         customerRepository.save(customer);
         accountRepository.save(account);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_BALANCE, account.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -1328,7 +1329,7 @@ public class EmployeeCustomerAccountTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_BALANCE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -1344,7 +1345,7 @@ public class EmployeeCustomerAccountTests {
         Employee employee = createEmployee(64);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/accounts/{accountId}/balance", account.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_BALANCE, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Account not found."))

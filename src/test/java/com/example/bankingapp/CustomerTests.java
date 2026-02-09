@@ -1,9 +1,10 @@
 package com.example.bankingapp;
 
-import com.example.bankingapp.dto.customer.CustomerLoginDTO;
+import com.example.bankingapp.dto.customer.CustomerLoginRequestDTO;
 import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.repository.CustomerRepository;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +17,24 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CustomerLoginTests {
+public class CustomerTests {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public CustomerLoginTests(MockMvc mockMvc,
-                              ObjectMapper objectMapper,
-                              CustomerRepository customerRepository,
-                              PasswordEncoder passwordEncoder){
+    public CustomerTests(MockMvc mockMvc,
+                         ObjectMapper objectMapper,
+                         CustomerRepository customerRepository,
+                         PasswordEncoder passwordEncoder){
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.customerRepository = customerRepository;
@@ -56,10 +58,10 @@ public class CustomerLoginTests {
         return customer;
     }
 
-    private CustomerLoginDTO createCustomerLoginDTO(int num){
+    private CustomerLoginRequestDTO createCustomerLoginDTO(int num){
         String i = "" + num;
         if(num < 100) i = "0" + num;
-        CustomerLoginDTO dto = new CustomerLoginDTO();
+        CustomerLoginRequestDTO dto = new CustomerLoginRequestDTO();
         dto.setUsername("rudra1" + i + "23");
         dto.setPassword("secret" + i);
 
@@ -81,13 +83,14 @@ public class CustomerLoginTests {
     }
 
     @Test
-    public void WhenLoginCustomer_ThenOk() throws Exception{
+    public void WhenGetCustomer_ThenOk() throws Exception{
         Customer customer = createCustomer(23);
         customerRepository.save(customer);
-        CustomerLoginDTO dto = createCustomerLoginDTO(23);
+        CustomerLoginRequestDTO dto = createCustomerLoginDTO(23);
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/login")
+                .perform(post(Endpoints.CUSTOMER_ME)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -98,16 +101,16 @@ public class CustomerLoginTests {
     public void WhenLoginWrongEmail_ThenUnauthorized() throws Exception{
         Customer customer = createCustomer(24);
         customerRepository.save(customer);
-        CustomerLoginDTO dto = createCustomerLoginDTO(24);
+        CustomerLoginRequestDTO dto = createCustomerLoginDTO(24);
         dto.setUsername("rudra123");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/login")
+                .perform(post(Endpoints.CUSTOMER_ME)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("The customer with the username " + dto.getUsername() + " does not exist." +
-                        "Please enter the valid username."))
+                .andExpect(jsonPath("$.message").value("The customer with the username rudra123 does not exist.Please enter the valid username."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.UNAUTHORIZED.value()));
     }
 
@@ -115,11 +118,12 @@ public class CustomerLoginTests {
     public void WhenLoginWrongPassword_ThenUnauthorized() throws Exception{
         Customer customer = createCustomer(25);
         customerRepository.save(customer);
-        CustomerLoginDTO dto = createCustomerLoginDTO(25);
+        CustomerLoginRequestDTO dto = createCustomerLoginDTO(25);
         dto.setPassword("secret");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/login")
+                .perform(post(Endpoints.CUSTOMER_ME)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
@@ -131,11 +135,12 @@ public class CustomerLoginTests {
     public void WhenLoginMissingUsername_ThenBadRequest() throws Exception{
         Customer customer = createCustomer(26);
         customerRepository.save(customer);
-        CustomerLoginDTO dto = createCustomerLoginDTO(26);
+        CustomerLoginRequestDTO dto = createCustomerLoginDTO(26);
         dto.setUsername("");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/login")
+                .perform(post(Endpoints.CUSTOMER_ME)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -146,11 +151,12 @@ public class CustomerLoginTests {
     public void WhenLoginMissingPassword_ThenBadRequest() throws Exception{
         Customer customer = createCustomer(27);
         customerRepository.save(customer);
-        CustomerLoginDTO dto = createCustomerLoginDTO(27);
+        CustomerLoginRequestDTO dto = createCustomerLoginDTO(27);
         dto.setPassword("");
         String requestBody = objectMapper.writeValueAsString(dto);
         mockMvc
-                .perform(post("/home/customer/login")
+                .perform(post(Endpoints.CUSTOMER_ME)
+                        .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())

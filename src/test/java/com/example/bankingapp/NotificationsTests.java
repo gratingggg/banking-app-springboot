@@ -9,6 +9,7 @@ import com.example.bankingapp.repository.CustomerRepository;
 import com.example.bankingapp.repository.NotificationRepository;
 import com.example.bankingapp.service.NotificationService;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Endpoints;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -94,7 +95,7 @@ public class NotificationsTests{
             notificationService.createNotification(customer, type, message);
         }
 
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get(Endpoints.NOTIFICATIONS_ALL)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .param("page", "2")
                         .param("size", "3")
@@ -117,7 +118,7 @@ public class NotificationsTests{
         Customer customer = createCustomer(166);
         customerRepository.save(customer);
 
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get(Endpoints.NOTIFICATIONS_ALL)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isEmpty());
@@ -125,7 +126,7 @@ public class NotificationsTests{
 
     @Test
     public void whenGetAllNotifications_InvalidCustomer_CustomerNotFound() throws Exception{
-        mockMvc.perform(get("/api/notifications")
+        mockMvc.perform(get(Endpoints.NOTIFICATIONS_ALL)
                 .with((user("IDoNotExist").roles("CUSTOMER"))))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("The customer with the username IDoNotExist not found."))
@@ -139,7 +140,7 @@ public class NotificationsTests{
         Notification notification = createNotification(customer, "Hey");
         notificationRepository.save(notification);
 
-        mockMvc.perform(get("/api/notifications/{notificationId}", notification.getId())
+        mockMvc.perform(get(Endpoints.NOTIFICATION_PARTICULAR, notification.getId())
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(notification.getMessage()))
@@ -149,7 +150,7 @@ public class NotificationsTests{
 
     @Test
     public void whenGetNotification_InvalidCustomer_ThenNotFound() throws Exception{
-        mockMvc.perform(get("/api/notifications/{notificationId}", 1)
+        mockMvc.perform(get(Endpoints.NOTIFICATION_PARTICULAR, 1)
                 .with(user("IDoNotExist").roles("CUSTOMER")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("The customer with the username IDoNotExist not found."))
@@ -161,7 +162,7 @@ public class NotificationsTests{
         Customer customer = createCustomer(168);
         customerRepository.save(customer);
 
-        mockMvc.perform(get("/api/notifications/{notificationId}" ,99999999999L)
+        mockMvc.perform(get(Endpoints.NOTIFICATION_PARTICULAR ,99999999999L)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Notification not found."))
@@ -176,7 +177,7 @@ public class NotificationsTests{
         Notification notification = createNotification(customer1, "Hey");
         notificationRepository.save(notification);
 
-        mockMvc.perform(get("/api/notifications/{notificationId}", notification.getId())
+        mockMvc.perform(get(Endpoints.NOTIFICATION_PARTICULAR, notification.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("You are trying to view someone else's notifications"))
@@ -194,7 +195,7 @@ public class NotificationsTests{
         List<Notification> list = notificationRepository.findAll(specification);
         assertEquals(10, list.stream().filter(Notification::isUnread).count());
 
-        mockMvc.perform(put("/api/notifications/read")
+        mockMvc.perform(put(Endpoints.NOTIFICATION_READ_ALL)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNoContent());
 
@@ -204,7 +205,7 @@ public class NotificationsTests{
 
     @Test
     public void whenReadAllNotifications_InvalidCustomer_ThenNotFound() throws Exception{
-        mockMvc.perform(put("/api/notifications/read")
+        mockMvc.perform(put(Endpoints.NOTIFICATION_READ_ALL)
                 .with(user("IDoNotExist").roles("CUSTOMER")))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("The customer with the username IDoNotExist not found."))

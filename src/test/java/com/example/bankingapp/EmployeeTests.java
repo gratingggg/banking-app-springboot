@@ -1,11 +1,12 @@
 package com.example.bankingapp;
 
-import com.example.bankingapp.dto.employee.EmployeeLoginDTO;
+import com.example.bankingapp.dto.employee.EmployeeLoginRequestDTO;
 import com.example.bankingapp.entities.baseentities.PersonGender;
 import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.employee.EmployeeRole;
 import com.example.bankingapp.entities.employee.EmployeeStatus;
 import com.example.bankingapp.repository.EmployeeRepository;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +19,24 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.LocalDate;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class EmployeeLoginTests {
+public class EmployeeTests {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EmployeeLoginTests(MockMvc mockMvc,
-                              ObjectMapper objectMapper,
-                              EmployeeRepository employeeRepository,
-                              PasswordEncoder passwordEncoder){
+    public EmployeeTests(MockMvc mockMvc,
+                         ObjectMapper objectMapper,
+                         EmployeeRepository employeeRepository,
+                         PasswordEncoder passwordEncoder){
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
         this.employeeRepository = employeeRepository;
@@ -59,10 +61,10 @@ public class EmployeeLoginTests {
         return employee;
     }
 
-    private EmployeeLoginDTO createEmployeeLoginDTO(int num){
+    private EmployeeLoginRequestDTO createEmployeeLoginDTO(int num){
         String i = "" + num;
         if(num < 100) i = "0" + num;
-        EmployeeLoginDTO dto = new EmployeeLoginDTO();
+        EmployeeLoginRequestDTO dto = new EmployeeLoginRequestDTO();
         dto.setUsername("parth1" + i + "23");
         dto.setPassword("secret" + i);
 
@@ -89,9 +91,10 @@ public class EmployeeLoginTests {
     public void WhenLoginEmployee_ThenOk() throws Exception{
         Employee employee = createEmployee(10);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(10);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(10);
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -102,10 +105,11 @@ public class EmployeeLoginTests {
     public void WhenLoginWrongEmail_ThenUnauthorized() throws Exception{
         Employee employee = createEmployee(11);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(11);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(11);
         dto.setUsername("rudra");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
@@ -117,10 +121,11 @@ public class EmployeeLoginTests {
     public void WhenLoginWrongPassword_ThenUnauthorized() throws Exception{
         Employee employee = createEmployee(12);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(12);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(12);
         dto.setPassword("secret");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())
@@ -132,10 +137,11 @@ public class EmployeeLoginTests {
     public void WhenLoginMissingUsername_ThenBadRequest() throws Exception{
         Employee employee = createEmployee(13);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(13);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(13);
         dto.setUsername("");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -146,10 +152,11 @@ public class EmployeeLoginTests {
     public void WhenLoginMissingPassword_ThenBadRequest() throws Exception{
         Employee employee = createEmployee(14);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(14);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(14);
         dto.setPassword("");
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
@@ -161,9 +168,10 @@ public class EmployeeLoginTests {
         Employee employee = createEmployee(15);
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
-        EmployeeLoginDTO dto = createEmployeeLoginDTO(15);
+        EmployeeLoginRequestDTO dto = createEmployeeLoginDTO(15);
         String requestBody = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(post("/home/employee/login")
+        mockMvc.perform(post(Endpoints.EMPLOYEE_ME)
+                        .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(requestBody))
                 .andExpect(status().isUnauthorized())

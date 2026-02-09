@@ -9,6 +9,7 @@ import com.example.bankingapp.entities.loan.LoanType;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.service.LoanService;
+import com.example.bankingapp.utils.Endpoints;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api")
 public class LoanController{
     private final LoanService loanService;
 
@@ -29,14 +29,14 @@ public class LoanController{
         this.loanService = loanService;
     }
 
-    @PostMapping("/customer/loan/apply")
+    @PostMapping(Endpoints.CUSTOMER_LOAN_APPLY)
     public ResponseEntity<LoanResponseDTO> createLoanByCustomer(@RequestBody LoanRequestDTO requestDTO, Principal principal){
         LoanResponseDTO responseDTO = loanService.createLoanByCustomer(requestDTO, principal.getName());
         URI location = URI.create("/api/loan/" + responseDTO.getLoanId());
         return ResponseEntity.created(location).body(responseDTO);
     }
 
-    @GetMapping("/customer/loan")
+    @GetMapping(Endpoints.CUSTOMER_LOAN_ALL)
     public ResponseEntity<Page<LoanResponseDTO>> getAllLoansByCustomer(@RequestParam(defaultValue = "0", required = false) int page,
                                                                        @RequestParam(defaultValue = "10", required = false) int size,
                                                                        @RequestParam(required = false)LoanStatus status,
@@ -48,20 +48,20 @@ public class LoanController{
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PostMapping("/customer/loan/repay")
+    @PostMapping(Endpoints.CUSTOMER_LOAN_REPAY)
     public ResponseEntity<TransactionResponseDTO> repayLoan(@RequestBody LoanRepaymentDTO repaymentDTO, Principal principal){
         TransactionResponseDTO responseDTO = loanService.repayLoan(repaymentDTO, principal.getName());
         URI location = URI.create("/api/transaction/" + responseDTO.getTransactionId());
         return ResponseEntity.created(location).body(responseDTO);
     }
 
-    @GetMapping("/customer/loan/{loanId}")
+    @GetMapping(Endpoints.CUSTOMER_LOAN_PARTICULAR)
     public ResponseEntity<LoanResponseDTO> getParticularLoan(@PathVariable Long loanId, Principal principal){
         LoanResponseDTO responseDTO = loanService.getParticularLoan(loanId, principal.getName());
         return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping("/customer/loan/{loanId}/transactions")
+    @GetMapping(Endpoints.CUSTOMER_LOAN_TRANSACTIONS)
     public ResponseEntity<Page<TransactionResponseDTO>> getLoanTransactions(@PathVariable Long loanId,
                                                                             @RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "10", required = false) int size,
@@ -76,7 +76,7 @@ public class LoanController{
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @PostMapping("/employee/customer/account/{accountId}/loan/apply")
+    @PostMapping(Endpoints.EMPLOYEE_LOAN_APPLY)
     public ResponseEntity<LoanResponseDTO> createLoanByEmployee(@RequestBody LoanRequestDTO requestDTO,
                                                                 @PathVariable Long accountId,
                                                                 Principal principal){
@@ -86,7 +86,7 @@ public class LoanController{
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping("/employee/customer/{customerId}/loan")
+    @GetMapping(Endpoints.EMPLOYEE_LOAN_ALL)
     public ResponseEntity<Page<LoanResponseDTO>> getAllLoansByEmployee(@PathVariable Long customerId,
                                                                             @RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "10", required = false) int size,
@@ -100,14 +100,14 @@ public class LoanController{
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping("employee/customer/loan/{loanId}")
+    @GetMapping(Endpoints.EMPLOYEE_LOAN_PARTICULAR)
     public ResponseEntity<LoanResponseDTO> getParticularLoanByEmployee(@PathVariable Long loanId, Principal principal){
         LoanResponseDTO responseDTO = loanService.getParticularLoanByEmployee(loanId, principal.getName());
         return ResponseEntity.ok(responseDTO);
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping("employee/customer/loan/{loanId}/transactions")
+    @GetMapping(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS)
     public ResponseEntity<Page<TransactionResponseDTO>> getLoanTransactionsByEmployee(@PathVariable Long loanId,
                                                                             @RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "10", required = false) int size,

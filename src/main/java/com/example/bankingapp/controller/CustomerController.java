@@ -1,9 +1,10 @@
 package com.example.bankingapp.controller;
 
-import com.example.bankingapp.dto.customer.CustomerLoginDTO;
+import com.example.bankingapp.dto.customer.CustomerLoginRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerResponseDTO;
 import com.example.bankingapp.service.CustomerService;
+import com.example.bankingapp.utils.Endpoints;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/home/customer")
 public class CustomerController {
     private final CustomerService customerService;
 
@@ -59,14 +59,14 @@ public class CustomerController {
         return fields;
     }
 
-    @PostMapping("/register")
+    @PostMapping(Endpoints.REGISTER)
     public ResponseEntity<CustomerResponseDTO> processCustomerRegistration(@Valid @RequestBody CustomerRequestDTO customerRequestDTO){
         CustomerResponseDTO customerResponseDTO = customerService.processCustomerRegistration(customerRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<CustomerResponseDTO> processCustomerLogin(@Valid @RequestBody CustomerLoginDTO customerLoginDTO){
+    @PostMapping(Endpoints.CUSTOMER_ME)
+    public ResponseEntity<CustomerResponseDTO> processCustomerLogin(@Valid @RequestBody CustomerLoginRequestDTO customerLoginDTO){
         CustomerResponseDTO customerResponseDTO = customerService.processCustomerLogin(customerLoginDTO);
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }

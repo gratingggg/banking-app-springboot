@@ -19,6 +19,7 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,7 +157,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -180,7 +181,7 @@ public class LoanTests {
         LoanRequestDTO requestDTO = createLoanRequest();
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -201,7 +202,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -224,7 +225,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                         .with(user(customer2.getUsername()).roles(customer2.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -247,7 +248,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -270,7 +271,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -293,7 +294,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -319,7 +320,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/customer/loan/apply")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_APPLY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -356,7 +357,7 @@ public class LoanTests {
         accountRepository.save(account);
         loanRepository.saveAll(loans);
 
-        mockMvc.perform(get("/api/customer/loan")
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_ALL)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -394,7 +395,7 @@ public class LoanTests {
         accountRepository.save(account);
         loanRepository.saveAll(loans);
 
-        mockMvc.perform(get("/api/customer/loan")
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_ALL)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .param("page", "1")
                         .param("size", "3")
@@ -426,7 +427,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -454,7 +455,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(new LoanRepaymentDTO());
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                 .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                 .contentType("application/json")
                 .content(body))
@@ -478,7 +479,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repaymentDTO);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -505,7 +506,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -532,7 +533,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -558,7 +559,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -585,7 +586,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -616,7 +617,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(repay);
 
-        mockMvc.perform(post("/api/customer/loan/repay")
+        mockMvc.perform(post(Endpoints.CUSTOMER_LOAN_REPAY)
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -640,7 +641,7 @@ public class LoanTests {
         accountRepository.save(account);
         loanRepository.save(loan);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_PARTICULAR, loan.getId())
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.loanId").value(loan.getId()))
@@ -659,7 +660,7 @@ public class LoanTests {
         loan.setId(99999999999999L);
         customerRepository.save(customer);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_PARTICULAR, loan.getId())
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Loan not found."))
@@ -678,7 +679,7 @@ public class LoanTests {
         accountRepository.save(account);
         loanRepository.save(loan);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_PARTICULAR, loan.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("Loan access denied."))
@@ -715,7 +716,7 @@ public class LoanTests {
         loanRepository.save(loan);
         transactionRepository.saveAll(transactions);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_TRANSACTIONS, loan.getId())
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -753,7 +754,7 @@ public class LoanTests {
         loanRepository.save(loan);
         transactionRepository.saveAll(transactions);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .param("page", "1")
                         .param("size", "3")
@@ -776,7 +777,7 @@ public class LoanTests {
         loan.setId(9999999999999L);
         customerRepository.save(customer);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Loan not found."))
@@ -795,7 +796,7 @@ public class LoanTests {
         accountRepository.save(account);
         loanRepository.save(loan);
 
-        mockMvc.perform(get("/api/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.CUSTOMER_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("Loan access denied."))
@@ -818,7 +819,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -847,7 +848,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(customer.getUsername()).roles(customer.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -870,7 +871,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -896,7 +897,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -918,7 +919,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -944,7 +945,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -970,7 +971,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -996,7 +997,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -1025,7 +1026,7 @@ public class LoanTests {
 
         String body = objectMapper.writeValueAsString(requestDTO);
 
-        mockMvc.perform(post("/api/employee/customer/account/{accountId}/loan/apply", account.getId())
+        mockMvc.perform(post(Endpoints.EMPLOYEE_LOAN_APPLY, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .contentType("application/json")
                         .content(body))
@@ -1065,7 +1066,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 7);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/loan", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
                 .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -1106,7 +1107,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 8);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/loan", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .param("page", "1")
                         .param("size", "3")
@@ -1131,7 +1132,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 9);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/loan", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
                 .with(user(employee.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -1147,7 +1148,7 @@ public class LoanTests {
         Employee employee = new Employee();
         employee.setUsername("IDoNotExist");
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/loan", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -1166,7 +1167,7 @@ public class LoanTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/{customerId}/loan", customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -1187,7 +1188,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 11);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_PARTICULAR, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.loanId").value(loan.getId()))
@@ -1209,7 +1210,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 12);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_PARTICULAR, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Loan not found."))
@@ -1230,7 +1231,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 13);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_PARTICULAR, loan.getId())
                         .with(user(employee.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -1249,7 +1250,7 @@ public class LoanTests {
         Employee employee = new Employee();
         employee.setUsername("IDoNotExist");
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_PARTICULAR, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -1271,7 +1272,7 @@ public class LoanTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_PARTICULAR, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -1311,7 +1312,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 15);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -1352,7 +1353,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 16);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .param("page", "1")
                         .param("size", "3")
@@ -1378,7 +1379,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 17);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Loan not found."))
@@ -1399,7 +1400,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 18);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -1418,7 +1419,7 @@ public class LoanTests {
         Employee employee = new Employee();
         employee.setUsername("IDoNotExist");
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -1440,7 +1441,7 @@ public class LoanTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get("/api/employee/customer/loan/{loanId}/transactions", loan.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS, loan.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
