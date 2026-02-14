@@ -613,6 +613,4 @@ public class CustomerAccountTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("You currently have active loan. Please clear them before deleting the account."));
     }
-
-
 }

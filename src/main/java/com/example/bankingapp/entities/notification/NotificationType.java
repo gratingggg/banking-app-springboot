@@ -4,5 +4,5 @@ public enum NotificationType {
     INFO,
     TRANSACTION,
     ALERT,
-    REMINDER,
+    REMINDER
 }

@@ -41,7 +41,7 @@ public class TransactionResponseDTO {
         if (transaction.getLoan() != null) setLoanId(transaction.getLoan().getId());
         setTransactionStatus(transaction.getTransactionStatus());
         setTransactionType(transaction.getTransactionType());
-        setFailureReason(transaction.getFailureReason());
+        if(transaction.getFailureReason() != null) setFailureReason(transaction.getFailureReason());
     }
 
     public String getHandledBy() {

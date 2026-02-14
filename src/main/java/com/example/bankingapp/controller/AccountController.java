@@ -143,7 +143,7 @@ public class AccountController {
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT)
     public ResponseEntity<TransactionResponseDTO> depositFund(@PathVariable Long accountId,
-                                                              @Valid @RequestParam(required = true)BigDecimal fund,
+                                                              @Valid @RequestParam BigDecimal fund,
                                                               Principal principal){
         TransactionResponseDTO responseDTO = accountService.depositFund(accountId, fund, principal.getName());
         URI location = URI.create("/api/transaction/" + responseDTO.getTransactionId());
@@ -153,12 +153,10 @@ public class AccountController {
     @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping(Endpoints.EMPLOYEE_ACCOUNT_WITHDRAWAL)
     public ResponseEntity<TransactionResponseDTO> withdrawFund(@PathVariable Long accountId,
-                                                               @Valid @RequestParam(required = true) BigDecimal fund,
+                                                               @Valid @RequestParam BigDecimal fund,
                                                                Principal principal){
         TransactionResponseDTO responseDTO = accountService.withdrawFund(accountId, fund, principal.getName());
         URI location = URI.create("/api/transaction/" + responseDTO.getTransactionId());
         return ResponseEntity.created(location).body(responseDTO);
     }
-
-
 }
