@@ -10,7 +10,6 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.service.LoanService;
 import com.example.bankingapp.utils.Endpoints;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,6 @@ import java.time.LocalDate;
 public class LoanController{
     private final LoanService loanService;
 
-    @Autowired
     public LoanController(LoanService loanService){
         this.loanService = loanService;
     }

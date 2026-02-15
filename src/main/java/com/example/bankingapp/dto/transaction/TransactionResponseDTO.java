@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class TransactionResponseDTO {
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime dateOfTransaction;
 
     private BigDecimal amount;
@@ -42,6 +42,7 @@ public class TransactionResponseDTO {
         setTransactionStatus(transaction.getTransactionStatus());
         setTransactionType(transaction.getTransactionType());
         if(transaction.getFailureReason() != null) setFailureReason(transaction.getFailureReason());
+        if(transaction.getHandledBy() != null) setHandledBy(transaction.getHandledBy().getName());
     }
 
     public String getHandledBy() {

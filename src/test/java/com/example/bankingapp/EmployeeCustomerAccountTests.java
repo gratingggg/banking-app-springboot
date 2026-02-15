@@ -620,7 +620,7 @@ public class EmployeeCustomerAccountTests {
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].transactionId").value(transaction.getId()))
-                .andExpect(jsonPath("$.content[0].dateOfTransaction").value(transaction.getDateOfTransaction().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                .andExpect(jsonPath("$.content[0].dateOfTransaction").value(transaction.getDateOfTransaction().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
                 .andExpect(jsonPath("$.content[0].amount").value("299.0"))
                 .andExpect(jsonPath("$.content[0].toAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.content[0].transactionType").value(transaction.getTransactionType().toString()))
@@ -908,7 +908,7 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.toAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.fromAccountId").doesNotExist())
-                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
                 .andExpect(jsonPath("$.transactionType").value(TransactionType.DEPOSIT.toString()))
                 .andExpect(jsonPath("$.transactionStatus").value(TransactionStatus.SUCCESS.toString()));
 
@@ -1084,7 +1084,7 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.fromAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.toAccountId").doesNotExist())
-                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
+                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
                 .andExpect(jsonPath("$.transactionType").value(TransactionType.WITHDRAWAL.toString()))
                 .andExpect(jsonPath("$.transactionStatus").value(TransactionStatus.SUCCESS.toString()));
 
