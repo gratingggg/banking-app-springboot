@@ -53,7 +53,8 @@ public class Loan extends BaseEntity {
     @NotNull(message = "interest rate cannot be null.")
     private BigDecimal rateOfInterest;
 
-    @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "loan", fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Transaction> transactions = new LinkedHashSet<>();
 
     @ManyToOne
@@ -164,9 +165,13 @@ public class Loan extends BaseEntity {
         BigDecimal balance = principalAmount;
 
         Map<Integer, BigDecimal> paymentsByMonth = getPaymentsByMonth();
-        long monthsElapsed = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
 
-        for (int month = 1; month <= monthsElapsed; month++) {
+        long monthsToProcess = Period.between(dateOfIssuance, LocalDate.now()).toTotalMonths();
+        if (monthsToProcess == 0 && !paymentsByMonth.isEmpty()) {
+            monthsToProcess = 1;
+        }
+
+        for (int month = 1; month <= monthsToProcess; month++) {
             BigDecimal interest = balance.multiply(monthlyRate);
             balance = balance.add(interest);
 

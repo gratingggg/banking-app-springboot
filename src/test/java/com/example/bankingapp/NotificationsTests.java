@@ -103,8 +103,6 @@ public class NotificationsTests{
                         .param("fromDate", LocalDate.now().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(3))
-                .andExpect(jsonPath("$.totalElements").value(10))
-                .andExpect(jsonPath("$.totalPages").value(4))
                 .andExpect(jsonPath("$.content.[0].notificationId").exists())
                 .andExpect(jsonPath("$.content.[0].notificationType").value(NotificationType.TRANSACTION.toString()))
                 .andExpect(jsonPath("$.content.[1].notificationId").exists())

@@ -102,7 +102,8 @@ public class LoanService {
     }
 
     private TransactionResponseDTO repayLoan(LoanRepaymentDTO repaymentDTO, Customer customer){
-        Loan loan = loanRepository.findById(repaymentDTO.getLoanId()).orElseThrow(LoanNotFoundException::new);
+        Loan loan = loanRepository.findByIdWithTransactions(repaymentDTO.getLoanId())
+                .orElseThrow(LoanNotFoundException::new);
         if(!loan.getAccount().getCustomer().getId().equals(customer.getId())) throw new LoanAccessDeniedException();
         if(!loan.getLoanStatus().equals(LoanStatus.DISBURSED)) throw new LoanNotDisbursedException();
         if(repaymentDTO.getAmount() == null || repaymentDTO.getAmount().compareTo(BigDecimal.ZERO) <= 0)
@@ -120,6 +121,7 @@ public class LoanService {
         BigDecimal balance = account.getBalance();
         BigDecimal outstandingAmount = loan.getOutstandingAmount();
 
+        System.out.println("Outstanding Amount: " + outstandingAmount);
         String message = "";
         if(balance.compareTo(repayAmount) < 0){
             transaction.setTransactionStatus(TransactionStatus.FAILED);
@@ -149,7 +151,6 @@ public class LoanService {
                         ". Remaining outstanding balance: " + newOutstanding + ".";
             }
         }
-        loan.addTransaction(transaction);
 
         if(!message.isEmpty()) notificationService.createNotification(customer, NotificationType.TRANSACTION, message);
         transactionRepostory.save(transaction);
@@ -254,5 +255,17 @@ public class LoanService {
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));
         Page<Transaction> transactions = transactionRepostory.findAll(spec, pageable);
         return transactions.map(TransactionResponseDTO::new);
+    }
+
+    public Page<LoanResponseDTO> getAllLoans(int page, int size, LoanStatus status, LoanType type,
+                                                       LocalDate fromDate, LocalDate toDate, String username){
+        validateEmployee(username);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfIssuance"));
+        Specification<Loan> specification = LoanSpecification
+                .withStatus(status)
+                .and(LoanSpecification.withType(type))
+                .and(LoanSpecification.dateBetween(fromDate, toDate));
+        Page<Loan> pageDTO = loanRepository.findAll(specification, pageable);
+        return pageDTO.map(LoanResponseDTO::new);
     }
 }

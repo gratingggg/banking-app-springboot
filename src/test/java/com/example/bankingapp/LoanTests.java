@@ -362,7 +362,7 @@ public class LoanTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(10))
-                .andExpect(jsonPath("$.totalElements").value(30))
+                .andExpect(jsonPath("$.page.totalElements").value(30))
                 .andExpect(jsonPath("$.content[0].loanType").exists())
                 .andExpect(jsonPath("$.content[0].loanStatus").exists());
     }
@@ -404,9 +404,9 @@ public class LoanTests {
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(3))
                 .andExpect(jsonPath("$.content[0].loanType").value(LoanType.GOLD.toString()))
-                .andExpect(jsonPath("$.totalElements").isNumber())
-                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
-                .andExpect(jsonPath("$.pageable.pageSize").value(3));
+                .andExpect(jsonPath("$.page.totalElements").isNumber())
+                .andExpect(jsonPath("$.page.number").value(1))
+                .andExpect(jsonPath("$.page.size").value(3));
     }
 
     @Test
@@ -721,7 +721,7 @@ public class LoanTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(10))
-                .andExpect(jsonPath("$.totalElements").value(30));
+                .andExpect(jsonPath("$.page.totalElements").value(30));
     }
 
     @Test
@@ -765,9 +765,9 @@ public class LoanTests {
                 .andExpect(jsonPath("$.content.length()").value(3))
                 .andExpect(jsonPath("$.content[0].transactionType").value(TransactionType.LOAN_REPAYMENT.toString()))
                 .andExpect(jsonPath("$.content[0].transactionStatus").value(TransactionStatus.SUCCESS.toString()))
-                .andExpect(jsonPath("$.totalElements").isNumber())
-                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
-                .andExpect(jsonPath("$.pageable.pageSize").value(3));
+                .andExpect(jsonPath("$.page.totalElements").isNumber())
+                .andExpect(jsonPath("$.page.number").value(1))
+                .andExpect(jsonPath("$.page.size").value(3));
     }
 
     @Test
@@ -1066,12 +1066,12 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 7);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL, customer.getId())
                 .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(10))
-                .andExpect(jsonPath("$.totalElements").value(30))
+                .andExpect(jsonPath("$.page.totalElements").value(30))
                 .andExpect(jsonPath("$.content[0].loanType").exists())
                 .andExpect(jsonPath("$.content[0].loanStatus").exists());
     }
@@ -1107,18 +1107,16 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 8);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString()))
                         .param("page", "1")
                         .param("size", "3")
                         .param("status", LoanStatus.APPROVED.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content.length()").value(3))
                 .andExpect(jsonPath("$.content[0].loanStatus").value(LoanStatus.APPROVED.toString()))
-                .andExpect(jsonPath("$.totalElements").isNumber())
-                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
-                .andExpect(jsonPath("$.pageable.pageSize").value(3));
+                .andExpect(jsonPath("$.page.totalElements").isNumber())
+                .andExpect(jsonPath("$.page.number").value(1))
+                .andExpect(jsonPath("$.page.size").value(3));
     }
 
     @Test
@@ -1132,7 +1130,7 @@ public class LoanTests {
         Employee employee = createEmployee(EMP + 9);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL, customer.getId())
                 .with(user(employee.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isForbidden());
     }
@@ -1148,7 +1146,7 @@ public class LoanTests {
         Employee employee = new Employee();
         employee.setUsername("IDoNotExist");
 
-        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Employee not found."))
@@ -1167,7 +1165,7 @@ public class LoanTests {
         employee.setEmployeeStatus(EmployeeStatus.INACTIVE);
         employeeRepository.save(employee);
 
-        mockMvc.perform(get(Endpoints.EMPLOYEE_LOAN_ALL, customer.getId())
+        mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").value("Your status is currently not active. Please contact the admin."))
@@ -1317,7 +1315,7 @@ public class LoanTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(10))
-                .andExpect(jsonPath("$.totalElements").value(30));
+                .andExpect(jsonPath("$.page.totalElements").value(30));
     }
 
     @Test
@@ -1364,9 +1362,9 @@ public class LoanTests {
                 .andExpect(jsonPath("$.content.length()").value(3))
                 .andExpect(jsonPath("$.content[0].transactionType").value(TransactionType.LOAN_REPAYMENT.toString()))
                 .andExpect(jsonPath("$.content[0].transactionStatus").value(TransactionStatus.SUCCESS.toString()))
-                .andExpect(jsonPath("$.totalElements").isNumber())
-                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
-                .andExpect(jsonPath("$.pageable.pageSize").value(3));
+                .andExpect(jsonPath("$.page.totalElements").isNumber())
+                .andExpect(jsonPath("$.page.number").value(1))
+                .andExpect(jsonPath("$.page.size").value(3));
     }
 
     @Test

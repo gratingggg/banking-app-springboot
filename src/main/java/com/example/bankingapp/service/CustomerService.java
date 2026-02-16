@@ -1,6 +1,5 @@
 package com.example.bankingapp.service;
 
-import com.example.bankingapp.dto.customer.CustomerLoginRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerResponseDTO;
 import com.example.bankingapp.entities.customer.Customer;
@@ -93,13 +92,11 @@ public class CustomerService {
         return mapCustomerToDTO(customer);
     }
 
-    public CustomerResponseDTO processCustomerLogin(CustomerLoginRequestDTO customerLoginDTO) {
-        Customer customer = customerRepository.findByUsername(customerLoginDTO.getUsername())
-                .orElseThrow(() -> new InvalidCredentialsException("The customer with the username " + customerLoginDTO.getUsername() + " does not exist." +
+    public CustomerResponseDTO getMyDetails(String username) {
+        Customer customer = customerRepository.findByUsername(username)
+                .orElseThrow(() -> new InvalidCredentialsException("The customer with the username " + username + " does not exist." +
                         "Please enter the valid username."));
 
-        if (passwordEncoder.matches(customerLoginDTO.getPassword(), customer.getPassword())) {
-            return mapCustomerToDTO(customer);
-        } else throw new InvalidCredentialsException("Password do not match. Please enter the correct password.");
+       return mapCustomerToDTO(customer);
     }
 }

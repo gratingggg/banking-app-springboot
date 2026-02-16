@@ -10,6 +10,8 @@ public class LoanAlreadyProcessedException extends RuntimeException {
     }
 
     public LoanAlreadyProcessedException() {
-        super("Loan is not pending.");
+        super("Loan already processed.");
     }
+
+
 }

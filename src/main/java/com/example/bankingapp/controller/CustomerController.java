@@ -1,6 +1,5 @@
 package com.example.bankingapp.controller;
 
-import com.example.bankingapp.dto.customer.CustomerLoginRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerRequestDTO;
 import com.example.bankingapp.dto.customer.CustomerResponseDTO;
 import com.example.bankingapp.service.CustomerService;
@@ -8,8 +7,12 @@ import com.example.bankingapp.utils.Endpoints;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,9 +68,9 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerResponseDTO);
     }
 
-    @PostMapping(Endpoints.CUSTOMER_ME)
-    public ResponseEntity<CustomerResponseDTO> processCustomerLogin(@Valid @RequestBody CustomerLoginRequestDTO customerLoginDTO){
-        CustomerResponseDTO customerResponseDTO = customerService.processCustomerLogin(customerLoginDTO);
+    @GetMapping(Endpoints.CUSTOMER_ME)
+    public ResponseEntity<CustomerResponseDTO> getMyDetailsCustomer(Principal principal){
+        CustomerResponseDTO customerResponseDTO = customerService.getMyDetails(principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body(customerResponseDTO);
     }
 }

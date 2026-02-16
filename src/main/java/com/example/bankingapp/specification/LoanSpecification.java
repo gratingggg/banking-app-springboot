@@ -15,13 +15,17 @@ public class LoanSpecification {
     }
 
     public static Specification<Loan> withStatus(LoanStatus status){
-        return (status == null) ? null : ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("loanStatus"), status));
+        return ((root, query, criteriaBuilder) ->
+                (status == null)
+                        ?criteriaBuilder.conjunction()
+                        :criteriaBuilder.equal(root.get("loanStatus"), status));
     }
 
     public static Specification<Loan> withType(LoanType type){
-        return (type == null) ? null : ((root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("loanType"), type));
+        return ((root, query, criteriaBuilder) ->
+                (type == null)
+                        ?criteriaBuilder.conjunction()
+                :criteriaBuilder.equal(root.get("loanType"), type));
     }
 
     public static Specification<Loan> dateBetween(LocalDate from, LocalDate to){
@@ -35,7 +39,7 @@ public class LoanSpecification {
             else if(to != null){
                 return builder.lessThanOrEqualTo(root.get("dateOfIssuance"), to.atTime(LocalTime.MAX));
             }
-            else return null;
+            else return builder.conjunction();
         };
     }
 }

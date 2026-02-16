@@ -84,8 +84,8 @@ public class LoanController{
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping(Endpoints.EMPLOYEE_LOAN_ALL)
-    public ResponseEntity<Page<LoanResponseDTO>> getAllLoansByEmployee(@PathVariable Long customerId,
+    @GetMapping(Endpoints.EMPLOYEE_CUSTOMER_LOAN_ALL)
+    public ResponseEntity<Page<LoanResponseDTO>> getAllCustomerLoansByEmployee(@PathVariable Long customerId,
                                                                             @RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "10", required = false) int size,
                                                                             @RequestParam(required = false)LoanStatus status,
@@ -117,5 +117,18 @@ public class LoanController{
         Page<TransactionResponseDTO> response = loanService.getLoanTransactionsByEmployee(loanId, page, size, status,
                 type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping(Endpoints.EMPLOYEE_LOAN_ALL)
+    public ResponseEntity<Page<LoanResponseDTO>> getAllLoans(@RequestParam(defaultValue = "0", required = false) int page,
+                                                                               @RequestParam(defaultValue = "10", required = false) int size,
+                                                                               @RequestParam(required = false)LoanStatus status,
+                                                                               @RequestParam(required = false)LoanType type,
+                                                                               @RequestParam(required = false) LocalDate fromDate,
+                                                                               @RequestParam(required = false)LocalDate toDate,
+                                                                               Principal principal){
+        Page<LoanResponseDTO> responseDTO = loanService.getAllLoans(page, size, status, type, fromDate, toDate, principal.getName());
+        return ResponseEntity.ok(responseDTO);
     }
 }

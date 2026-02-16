@@ -44,15 +44,17 @@ public class TransactionSpecifications {
     }
 
     public static Specification<Transaction> withStatus(TransactionStatus status){
-        return (status == null) ? null :
-                (root, query, builder) ->
-                        builder.equal(root.get("transactionStatus"), status);
+        return (root, query, builder) ->
+                (status == null)
+                        ?builder.conjunction()
+                        :builder.equal(root.get("transactionStatus"), status);
     }
 
     public static Specification<Transaction> withType(TransactionType type){
-        return (type == null) ? null :
-                (root, query, builder) ->
-                        builder.equal(root.get("transactionType"), type);
+        return (root, query, builder) ->
+                (type == null)
+                        ?builder.conjunction()
+                        :builder.equal(root.get("transactionType"), type);
     }
 
     public static Specification<Transaction> dateBetween(LocalDate from, LocalDate to){
@@ -66,7 +68,7 @@ public class TransactionSpecifications {
             if(to != null){
                 return builder.lessThanOrEqualTo(root.get("dateOfTransaction"), to.atTime(LocalTime.MAX));
             }
-            else return null;
+            else return builder.conjunction();
         };
     }
 }

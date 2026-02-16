@@ -13,8 +13,8 @@ public class Endpoints {
 
 
     public static final String EMPLOYEE_ME = "/api/employee/me";
-    public static final String EMPLOYEE_LOANS_PENDING = "/api/employee/loans/pending";
     public static final String EMPLOYEE_LOANS_PROCESS = "/api/employee/loans/{loanId}/process";
+    public static final String EMPLOYEE_LOANS_DISBURSE = "/api/employee/loans/{loanId}/disburse";
 
 
 
@@ -44,10 +44,10 @@ public class Endpoints {
     public static final String CUSTOMER_LOAN_TRANSACTIONS = "/api/customer/loan/{loanId}/transactions";
 
     public static final String EMPLOYEE_LOAN_APPLY = "/api/employee/customer/account/{accountId}/loan/apply";
-    public static final String EMPLOYEE_LOAN_ALL = "/api/employee/customer/{customerId}/loan";
+    public static final String EMPLOYEE_CUSTOMER_LOAN_ALL = "/api/employee/customer/{customerId}/loan";
     public static final String EMPLOYEE_LOAN_PARTICULAR = "/api/employee/customer/loan/{loanId}";
     public static final String EMPLOYEE_LOAN_TRANSACTIONS = "/api/employee/customer/loan/{loanId}/transactions";
-
+    public static final String EMPLOYEE_LOAN_ALL = "/api/employee/customer/loan/all";
 
 
     public static final String TRANSACTIONS_CUSTOMER_TRANSFER = "/api/customer/transactions/transfer";

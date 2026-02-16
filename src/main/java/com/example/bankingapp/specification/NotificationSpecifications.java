@@ -16,15 +16,17 @@ public class NotificationSpecifications {
     }
 
     public static Specification<Notification> withType(NotificationType type){
-        return (type == null) ? null :
-                ((root, query, builder) ->
-                        builder.equal(root.get("notificationType"), type));
+        return ((root, query, builder) ->
+                (type == null)
+                        ?builder.conjunction()
+                        :builder.equal(root.get("notificationType"), type));
     }
 
     public static Specification<Notification> withStatus(NotificationStatus status){
-        return (status == null) ? null :
-                ((root, query, builder) ->
-                        builder.equal(root.get("notificationStatus"), status));
+        return ((root, query, builder) ->
+                (status == null)
+                        ?builder.conjunction()
+                        :builder.equal(root.get("notificationStatus"), status));
     }
 
     public static Specification<Notification> withDate(LocalDate from, LocalDate to){
@@ -41,7 +43,7 @@ public class NotificationSpecifications {
                 return builder.lessThanOrEqualTo(root.get("date"), to.atTime(LocalTime.MAX));
             }
 
-            return null;
+            return builder.conjunction();
         };
     }
 }

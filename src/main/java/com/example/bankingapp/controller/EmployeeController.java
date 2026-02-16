@@ -1,16 +1,15 @@
 package com.example.bankingapp.controller;
 
-import com.example.bankingapp.dto.employee.EmployeeLoginRequestDTO;
 import com.example.bankingapp.dto.employee.EmployeeResponseDTO;
 import com.example.bankingapp.dto.loan.LoanResponseDTO;
-import com.example.bankingapp.entities.loan.Loan;
-import com.example.bankingapp.entities.loan.LoanType;
+import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
 import com.example.bankingapp.service.EmployeeService;
 import com.example.bankingapp.utils.Endpoints;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -55,19 +54,10 @@ public class EmployeeController {
         return form;
     }
 
-    @PostMapping(Endpoints.EMPLOYEE_ME)
-    public ResponseEntity<EmployeeResponseDTO> processEmployeeLogin(@Valid @RequestBody EmployeeLoginRequestDTO employeeLoginDTO){
-        EmployeeResponseDTO employeeResponseDTO = employeeService.processEmployeeLogin(employeeLoginDTO);
+    @GetMapping(Endpoints.EMPLOYEE_ME)
+    public ResponseEntity<EmployeeResponseDTO> getMyDetailsEmployee(Principal principal){
+        EmployeeResponseDTO employeeResponseDTO = employeeService.getMyDetails(principal.getName());
         return ResponseEntity.ok(employeeResponseDTO);
-    }
-
-    @GetMapping(Endpoints.EMPLOYEE_LOANS_PENDING)
-    public ResponseEntity<Page<Loan>> getPendingLoans(@RequestParam(required = false, defaultValue = "0") int page,
-                                                      @RequestParam(required = false, defaultValue = "10") int size,
-                                                      @RequestParam(required = false) LoanType type,
-                                                      Principal principal){
-        Page<Loan> loans = employeeService.getPendingLoans(page, size, type, principal.getName());
-        return ResponseEntity.ok(loans);
     }
 
     @PostMapping(Endpoints.EMPLOYEE_LOANS_PROCESS)
@@ -76,5 +66,11 @@ public class EmployeeController {
                                                        Principal principal){
         LoanResponseDTO loanResponseDTO = employeeService.processLoan(loanId, action, principal.getName());
         return ResponseEntity.ok(loanResponseDTO);
+    }
+
+    @PostMapping(Endpoints.EMPLOYEE_LOANS_DISBURSE)
+    public ResponseEntity<TransactionResponseDTO> disburseLoan(@PathVariable Long loanId, Principal principal){
+        TransactionResponseDTO transactionResponseDTO = employeeService.disburseLoan(loanId, principal.getName());
+        return ResponseEntity.ok(transactionResponseDTO);
     }
 }

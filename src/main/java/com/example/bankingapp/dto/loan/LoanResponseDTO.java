@@ -18,6 +18,7 @@ public class LoanResponseDTO {
 
     private Integer tenureInMonths;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate dateOfRepayment;
 
     private LoanType loanType;
@@ -30,6 +31,8 @@ public class LoanResponseDTO {
 
     private BigDecimal emi;
 
+    private BigDecimal outstandingAmount;
+
     public LoanResponseDTO(Loan loan){
         accountId = loan.getAccount().getId();
         loanId = loan.getId();
@@ -41,6 +44,7 @@ public class LoanResponseDTO {
         principalAmount = loan.getPrincipalAmount();
         rateOfInterest = loan.getRateOfInterest();
         emi = loan.calculateEMI();
+        if(loan.getDateOfIssuance() != null) outstandingAmount = loan.getOutstandingAmount();
     }
 
     public BigDecimal getEmi() {
@@ -121,5 +125,13 @@ public class LoanResponseDTO {
 
     public void setRateOfInterest(BigDecimal rateOfInterest) {
         this.rateOfInterest = rateOfInterest;
+    }
+
+    public BigDecimal getOutstandingAmount() {
+        return outstandingAmount;
+    }
+
+    public void setOutstandingAmount(BigDecimal outstandingAmount) {
+        this.outstandingAmount = outstandingAmount;
     }
 }
