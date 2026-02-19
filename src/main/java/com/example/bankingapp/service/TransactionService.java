@@ -16,7 +16,10 @@ import com.example.bankingapp.repository.CustomerRepository;
 import com.example.bankingapp.repository.EmployeeRepository;
 import com.example.bankingapp.repository.TransactionRepository;
 import com.example.bankingapp.specification.TransactionSpecifications;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,6 @@ public class TransactionService {
     private final EmployeeRepository employeeRepository;
     private final NotificationService notificationService;
 
-    @Autowired
     public TransactionService(TransactionRepository transactionRepository,
                               CustomerRepository customerRepository,
                               AccountRepository accountRepository,
@@ -94,6 +96,17 @@ public class TransactionService {
         if (transaction.getHandledBy() != null) dto.setHandledBy(transaction.getHandledBy().getName());
 
         return dto;
+    }
+
+    private Page<TransactionResponseDTO> getAllTransactions(Customer customer, int page, int size, TransactionStatus status,
+                                                            TransactionType type, LocalDate fromDate, LocalDate toDate){
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction").descending());
+        Specification<Transaction> specification = TransactionSpecifications.forCustomers(customer.getId())
+                .and(TransactionSpecifications.withStatus(status))
+                .and(TransactionSpecifications.withType(type))
+                .and(TransactionSpecifications.dateBetween(fromDate, toDate));
+        Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
+        return transactions.map(TransactionResponseDTO::new);
     }
 
     private Transaction transfer(Account fromAccount, Account toAccount, BigDecimal amount) {
@@ -162,7 +175,7 @@ public class TransactionService {
     public TransactionResponseDTO getTransaction(Long transactionId, String username) {
         Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new CustomerNotFoundException("The customer with username " + username + " not found."));
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(TransactionNotFoundException::new);
-        if (!transaction.getFromAccount().getCustomer().equals(customer) && !transaction.getToAccount().getCustomer().equals(customer)) {
+        if (!((transaction.getFromAccount() != null && transaction.getFromAccount().getCustomer().equals(customer)) || (transaction.getToAccount() != null && transaction.getToAccount().getCustomer().equals(customer)))) {
             throw new TransactionAccessDeniedException();
         }
         return transactionToDTO(transaction);
@@ -185,5 +198,18 @@ public class TransactionService {
         transactionRepository.save(transaction);
 
         return transactionToDTO(transaction);
+    }
+
+    public Page<TransactionResponseDTO> getAllTransactionsOfCustomer(Long customerId, int page, int size, TransactionStatus status,
+                                                                     TransactionType type, LocalDate fromDate, LocalDate toDate, String employeeUsername){
+        validateEmployeeFromUsername(employeeUsername);
+        Customer customer = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
+        return getAllTransactions(customer, page, size, status, type, fromDate, toDate);
+    }
+
+    public Page<TransactionResponseDTO> getAllTransactionsByCustomer(int page, int size, TransactionStatus status,
+                                                                     TransactionType type, LocalDate fromDate, LocalDate toDate, String username) {
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new CustomerNotFoundException("The customer with username " + username + " not found."));
+        return getAllTransactions(customer, page, size, status, type, fromDate, toDate);
     }
 }

@@ -273,19 +273,6 @@ public class AccountService {
         return  getBalance(account);
     }
 
-    public Page<TransactionResponseDTO> getAllTransactionsOfCustomer(Long customerId, int page, int size, TransactionStatus status,
-                                                                     TransactionType type, LocalDate fromDate, LocalDate toDate, String employeeUsername){
-        validateEmployeeFromUsername(employeeUsername);
-        Customer customer = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction").descending());
-        Specification<Transaction> specification = TransactionSpecifications.forCustomers(customerId)
-                .and(TransactionSpecifications.withStatus(status))
-                .and(TransactionSpecifications.withType(type))
-                .and(TransactionSpecifications.dateBetween(fromDate, toDate));
-        Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-        return transactions.map(TransactionResponseDTO::new);
-    }
-
     @Transactional
     public TransactionResponseDTO depositFund(Long accountId, BigDecimal fund, String employeeUsername){
         Employee employee = validateEmployeeFromUsername(employeeUsername);

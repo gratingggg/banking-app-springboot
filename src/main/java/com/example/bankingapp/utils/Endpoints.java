@@ -31,7 +31,6 @@ public class Endpoints {
     public static final String EMPLOYEE_ACCOUNT_CREATE = "/api/employee/customer/{customerId}/accounts";
     public static final String EMPLOYEE_ACCOUNT_DELETE = "/api/employee/accounts/{accountId}/close";
     public static final String EMPLOYEE_ACCOUNT_BALANCE = "/api/employee/accounts/{accountId}/balance";
-    public static final String EMPLOYEE_CUSTOMER_TRANSACTION_ALL = "/api/employee/customer/{customerId}/accounts/transactions";
     public static final String EMPLOYEE_ACCOUNT_DEPOSIT = "/api/employee/accounts/{accountId}/deposit";
     public static final String EMPLOYEE_ACCOUNT_WITHDRAWAL = "/api/employee/accounts/{accountId}/withdrawal";
 
@@ -52,9 +51,12 @@ public class Endpoints {
 
     public static final String TRANSACTIONS_CUSTOMER_TRANSFER = "/api/customer/transactions/transfer";
     public static final String TRANSACTION_CUSTOMER = "/api/customer/transactions/{transactionId}";
+    public static final String CUSTOMER_TRANSACTION_ALL = "/api/customer/transactions";
 
     public static final String TRANSACTIONS_EMPLOYEE_TRANSFER = "/api/employee/transactions/transfer";
     public static final String TRANSACTION_EMPLOYEE = "/api/employee/transactions/{transactionId}";
+    public static final String EMPLOYEE_CUSTOMER_TRANSACTION_ALL = "/api/employee/customer/{customerId}/transactions";
+
 
 
 

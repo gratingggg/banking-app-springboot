@@ -126,21 +126,6 @@ public class AccountController {
     }
 
     @PreAuthorize("hasRole('EMPLOYEE')")
-    @GetMapping(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL)
-    public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfCustomer(@PathVariable Long customerId,
-                                                                                     @RequestParam(required = false, defaultValue = "0") int page,
-                                                                                     @RequestParam(required = false, defaultValue = "10") int size,
-                                                                                     @RequestParam(required = false) TransactionStatus status,
-                                                                                     @RequestParam(required = false) TransactionType type,
-                                                                                     @RequestParam(required = false) LocalDate fromDate,
-                                                                                     @RequestParam(required = false) LocalDate toDate,
-                                                                                     Principal principal){
-        Page<TransactionResponseDTO> responseDTOS = accountService.getAllTransactionsOfCustomer(customerId, page, size,
-                status, type, fromDate, toDate, principal.getName());
-        return ResponseEntity.ok(responseDTOS);
-    }
-
-    @PreAuthorize("hasRole('EMPLOYEE')")
     @PostMapping(Endpoints.EMPLOYEE_ACCOUNT_DEPOSIT)
     public ResponseEntity<TransactionResponseDTO> depositFund(@PathVariable Long accountId,
                                                               @Valid @RequestParam BigDecimal fund,

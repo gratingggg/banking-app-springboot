@@ -116,6 +116,7 @@ public class LoanService {
         transaction.setAmount(repaymentDTO.getAmount());
         transaction.setFromAccount(account);
         transaction.setDateOfTransaction(LocalDateTime.now());
+        transaction.setLoan(loan);
 
         BigDecimal repayAmount = repaymentDTO.getAmount();
         BigDecimal balance = account.getBalance();

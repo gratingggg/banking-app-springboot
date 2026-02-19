@@ -12,7 +12,7 @@ public class NotificationResponseDTO {
 
     private String message;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = "dd-MM-yyyy hh:MM:ss")
     private LocalDateTime date;
 
     private NotificationStatus notificationStatus;

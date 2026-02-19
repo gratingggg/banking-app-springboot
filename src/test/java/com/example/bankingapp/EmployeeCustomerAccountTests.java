@@ -801,7 +801,7 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user("IDoNotExist").roles("EMPLOYEE")))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Employee not found."))
+                .andExpect(jsonPath("$.message").value("Employee with username IDoNotExist not found."))
                 .andExpect(jsonPath("$.statusCode").value(HttpStatus.NOT_FOUND.value()));
     }
 
