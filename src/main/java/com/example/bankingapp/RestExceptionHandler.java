@@ -84,7 +84,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", "400");
         Map<String, Object> errors = new LinkedHashMap<>();
-        errors.put("gender", "Invalid gender. Allowed genders : MALE, FEMALE, TRANSGENDER");
+        errors.put("message", ex.getMostSpecificCause().getMessage());
+        errors.put("cause", ex.getMostSpecificCause().getCause());
         body.put("errors", errors);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }

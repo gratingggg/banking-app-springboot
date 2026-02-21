@@ -2,6 +2,7 @@ package com.example.bankingapp.controller;
 
 import com.example.bankingapp.dto.transaction.TransactionRequestDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.dto.transaction.TransactionSummaryDTO;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.service.TransactionService;
@@ -39,14 +40,14 @@ public class TransactionController {
     }
 
     @GetMapping(Endpoints.CUSTOMER_TRANSACTION_ALL)
-    public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsByCustomer(@RequestParam(required = false, defaultValue = "0") int page,
-                                                                                     @RequestParam(required = false, defaultValue = "10") int size,
-                                                                                     @RequestParam(required = false) TransactionStatus status,
-                                                                                     @RequestParam(required = false) TransactionType type,
-                                                                                     @RequestParam(required = false) LocalDate fromDate,
-                                                                                     @RequestParam(required = false) LocalDate toDate,
-                                                                                     Principal principal) {
-        Page<TransactionResponseDTO> responseDTOS = transactionService.getAllTransactionsByCustomer(page, size, status, type, fromDate, toDate, principal.getName());
+    public ResponseEntity<Page<TransactionSummaryDTO>> getAllTransactionsByCustomer(@RequestParam(required = false, defaultValue = "0") int page,
+                                                                                    @RequestParam(required = false, defaultValue = "10") int size,
+                                                                                    @RequestParam(required = false) TransactionStatus status,
+                                                                                    @RequestParam(required = false) TransactionType type,
+                                                                                    @RequestParam(required = false) LocalDate fromDate,
+                                                                                    @RequestParam(required = false) LocalDate toDate,
+                                                                                    Principal principal) {
+        Page<TransactionSummaryDTO> responseDTOS = transactionService.getAllTransactionsByCustomer(page, size, status, type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(responseDTOS);
     }
 
@@ -69,7 +70,7 @@ public class TransactionController {
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL)
-    public ResponseEntity<Page<TransactionResponseDTO>> getAllTransactionsOfCustomer(@PathVariable Long customerId,
+    public ResponseEntity<Page<TransactionSummaryDTO>> getAllTransactionsOfCustomer(@PathVariable Long customerId,
                                                                                      @RequestParam(required = false, defaultValue = "0") int page,
                                                                                      @RequestParam(required = false, defaultValue = "10") int size,
                                                                                      @RequestParam(required = false) TransactionStatus status,
@@ -77,7 +78,7 @@ public class TransactionController {
                                                                                      @RequestParam(required = false) LocalDate fromDate,
                                                                                      @RequestParam(required = false) LocalDate toDate,
                                                                                      Principal principal){
-        Page<TransactionResponseDTO> responseDTOS = transactionService.getAllTransactionsOfCustomer(customerId, page, size,
+        Page<TransactionSummaryDTO> responseDTOS = transactionService.getAllTransactionsOfCustomer(customerId, page, size,
                 status, type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(responseDTOS);
     }

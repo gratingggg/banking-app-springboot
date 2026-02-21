@@ -228,8 +228,7 @@ public class CustomerRegisterControllerTest {
                 .perform(post(Endpoints.REGISTER)
                         .contentType("application/json")
                         .content(requestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors.gender").value( "Invalid gender. Allowed genders : MALE, FEMALE, TRANSGENDER"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test

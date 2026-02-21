@@ -1,6 +1,7 @@
 package com.example.bankingapp.service;
 
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.dto.transaction.TransactionSummaryDTO;
 import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.customer.Customer;
@@ -82,23 +83,7 @@ public class TransactionService {
         return employee;
     }
 
-    private TransactionResponseDTO transactionToDTO(Transaction transaction) {
-        TransactionResponseDTO dto = new TransactionResponseDTO();
-        if (transaction.getFromAccount() != null) dto.setFromAccountId(transaction.getFromAccount().getId());
-        if (transaction.getToAccount() != null) dto.setToAccountId(transaction.getToAccount().getId());
-        dto.setTransactionId(transaction.getId());
-        dto.setAmount(transaction.getAmount());
-        dto.setDateOfTransaction(transaction.getDateOfTransaction());
-        if (transaction.getLoan() != null) dto.setLoanId(transaction.getLoan().getId());
-        dto.setTransactionStatus(transaction.getTransactionStatus());
-        dto.setTransactionType(transaction.getTransactionType());
-        dto.setFailureReason(transaction.getFailureReason());
-        if (transaction.getHandledBy() != null) dto.setHandledBy(transaction.getHandledBy().getName());
-
-        return dto;
-    }
-
-    private Page<TransactionResponseDTO> getAllTransactions(Customer customer, int page, int size, TransactionStatus status,
+    private Page<TransactionSummaryDTO> getAllTransactions(Customer customer, int page, int size, TransactionStatus status,
                                                             TransactionType type, LocalDate fromDate, LocalDate toDate){
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction").descending());
         Specification<Transaction> specification = TransactionSpecifications.forCustomers(customer.getId())
@@ -106,7 +91,9 @@ public class TransactionService {
                 .and(TransactionSpecifications.withType(type))
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));
         Page<Transaction> transactions = transactionRepository.findAll(specification, pageable);
-        return transactions.map(TransactionResponseDTO::new);
+        return transactions.map(
+                transaction -> new TransactionSummaryDTO(transaction, customer)
+        );
     }
 
     private Transaction transfer(Account fromAccount, Account toAccount, BigDecimal amount) {
@@ -169,7 +156,7 @@ public class TransactionService {
         }
         Transaction transaction = transfer(fromAccount, toAccount, amount);
 
-        return transactionToDTO(transaction);
+        return new TransactionResponseDTO(transaction, customer);
     }
 
     public TransactionResponseDTO getTransaction(Long transactionId, String username) {
@@ -178,13 +165,14 @@ public class TransactionService {
         if (!((transaction.getFromAccount() != null && transaction.getFromAccount().getCustomer().equals(customer)) || (transaction.getToAccount() != null && transaction.getToAccount().getCustomer().equals(customer)))) {
             throw new TransactionAccessDeniedException();
         }
-        return transactionToDTO(transaction);
+
+        return new TransactionResponseDTO(transaction, customer);
     }
 
     public TransactionResponseDTO getTransactionByEmployee(Long transactionId, String username) {
         validateEmployeeFromUsername(username);
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(TransactionNotFoundException::new);
-        return transactionToDTO(transaction);
+        return new TransactionResponseDTO(transaction, null);
     }
 
     @Transactional
@@ -197,17 +185,17 @@ public class TransactionService {
         employeeRepository.save(employee);
         transactionRepository.save(transaction);
 
-        return transactionToDTO(transaction);
+        return new TransactionResponseDTO(transaction, null);
     }
 
-    public Page<TransactionResponseDTO> getAllTransactionsOfCustomer(Long customerId, int page, int size, TransactionStatus status,
+    public Page<TransactionSummaryDTO> getAllTransactionsOfCustomer(Long customerId, int page, int size, TransactionStatus status,
                                                                      TransactionType type, LocalDate fromDate, LocalDate toDate, String employeeUsername){
         validateEmployeeFromUsername(employeeUsername);
         Customer customer = customerRepository.findById(customerId).orElseThrow(CustomerNotFoundException::new);
         return getAllTransactions(customer, page, size, status, type, fromDate, toDate);
     }
 
-    public Page<TransactionResponseDTO> getAllTransactionsByCustomer(int page, int size, TransactionStatus status,
+    public Page<TransactionSummaryDTO> getAllTransactionsByCustomer(int page, int size, TransactionStatus status,
                                                                      TransactionType type, LocalDate fromDate, LocalDate toDate, String username) {
         Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new CustomerNotFoundException("The customer with username " + username + " not found."));
         return getAllTransactions(customer, page, size, status, type, fromDate, toDate);

@@ -18,7 +18,7 @@ public class Endpoints {
 
 
 
-    public static final String CUSTOMER_ACCOUNTS_ALL = "/api/customer/accounts";
+    public static final String CUSTOMER_ACCOUNTS_ALL = "/api/customer/accounts/all";
     public static final String CUSTOMER_ACCOUNT_PARTICULAR = "/api/customer/accounts/{accountId}";
     public static final String CUSTOMER_ACCOUNT_TRANSACTION_ALL = "/api/customer/accounts/{accountId}/transactions";
     public static final String CUSTOMER_ACCOUNT_CREATE = "/api/customer/accounts";

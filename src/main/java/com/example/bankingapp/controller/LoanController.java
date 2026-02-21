@@ -4,6 +4,7 @@ import com.example.bankingapp.dto.loan.LoanRepaymentDTO;
 import com.example.bankingapp.dto.loan.LoanRequestDTO;
 import com.example.bankingapp.dto.loan.LoanResponseDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.dto.transaction.TransactionSummaryDTO;
 import com.example.bankingapp.entities.loan.LoanStatus;
 import com.example.bankingapp.entities.loan.LoanType;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
@@ -60,7 +61,7 @@ public class LoanController{
     }
 
     @GetMapping(Endpoints.CUSTOMER_LOAN_TRANSACTIONS)
-    public ResponseEntity<Page<TransactionResponseDTO>> getLoanTransactions(@PathVariable Long loanId,
+    public ResponseEntity<Page<TransactionSummaryDTO>> getLoanTransactions(@PathVariable Long loanId,
                                                                             @RequestParam(defaultValue = "0", required = false) int page,
                                                                             @RequestParam(defaultValue = "10", required = false) int size,
                                                                             @RequestParam(required = false) TransactionStatus status,
@@ -68,7 +69,7 @@ public class LoanController{
                                                                             @RequestParam(required = false) LocalDate fromDate,
                                                                             @RequestParam(required = false) LocalDate toDate,
                                                                             Principal principal){
-        Page<TransactionResponseDTO> response = loanService.getLoanTransactions(loanId, page, size, status,
+        Page<TransactionSummaryDTO> response = loanService.getLoanTransactions(loanId, page, size, status,
                 type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(response);
     }
@@ -106,15 +107,15 @@ public class LoanController{
 
     @PreAuthorize("hasRole('EMPLOYEE')")
     @GetMapping(Endpoints.EMPLOYEE_LOAN_TRANSACTIONS)
-    public ResponseEntity<Page<TransactionResponseDTO>> getLoanTransactionsByEmployee(@PathVariable Long loanId,
-                                                                            @RequestParam(defaultValue = "0", required = false) int page,
-                                                                            @RequestParam(defaultValue = "10", required = false) int size,
-                                                                            @RequestParam(required = false) TransactionStatus status,
-                                                                            @RequestParam(required = false) TransactionType type,
-                                                                            @RequestParam(required = false) LocalDate fromDate,
-                                                                            @RequestParam(required = false) LocalDate toDate,
-                                                                            Principal principal){
-        Page<TransactionResponseDTO> response = loanService.getLoanTransactionsByEmployee(loanId, page, size, status,
+    public ResponseEntity<Page<TransactionSummaryDTO>> getLoanTransactionsByEmployee(@PathVariable Long loanId,
+                                                                                     @RequestParam(defaultValue = "0", required = false) int page,
+                                                                                     @RequestParam(defaultValue = "10", required = false) int size,
+                                                                                     @RequestParam(required = false) TransactionStatus status,
+                                                                                     @RequestParam(required = false) TransactionType type,
+                                                                                     @RequestParam(required = false) LocalDate fromDate,
+                                                                                     @RequestParam(required = false) LocalDate toDate,
+                                                                                     Principal principal){
+        Page<TransactionSummaryDTO> response = loanService.getLoanTransactionsByEmployee(loanId, page, size, status,
                 type, fromDate, toDate, principal.getName());
         return ResponseEntity.ok(response);
     }

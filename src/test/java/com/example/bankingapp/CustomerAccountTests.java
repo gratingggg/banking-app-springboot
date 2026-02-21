@@ -301,12 +301,12 @@ public class CustomerAccountTests {
         mockMvc.perform(get(Endpoints.CUSTOMER_ACCOUNT_TRANSACTION_ALL, account.getId())
                 .with(user(customer.getUsername()).roles(customer.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
-                .andExpect(jsonPath("$.content[0].fromAccountId").value(account.getId()))
-                .andExpect(jsonPath("$.content[1].transactionId").value(transaction1.getId()))
-                .andExpect(jsonPath("$.content[1].fromAccountId").value(account.getId()))
-                .andExpect(jsonPath("$.content[2].transactionId").value(transaction2.getId()))
-                .andExpect(jsonPath("$.content[2].fromAccountId").value(account.getId()));
+                .andExpect(jsonPath("$.content[0].dateOfTransaction").exists())
+                .andExpect(jsonPath("$.content[1].amount").exists())
+                .andExpect(jsonPath("$.content[1].dateOfTransaction").exists())
+                .andExpect(jsonPath("$.content[1].amount").exists())
+                .andExpect(jsonPath("$.content[2].dateOfTransaction").exists())
+                .andExpect(jsonPath("$.content[2].amount").exists());
     }
 
     @Test

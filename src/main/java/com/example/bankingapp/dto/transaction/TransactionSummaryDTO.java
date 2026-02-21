@@ -1,0 +1,71 @@
+package com.example.bankingapp.dto.transaction;
+
+import com.example.bankingapp.entities.customer.Customer;
+import com.example.bankingapp.entities.transaction.Transaction;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class TransactionSummaryDTO {
+    private Long transactionId;
+
+    private String otherCustomer;
+
+    private LocalDate dateOfTransaction;
+
+    private BigDecimal amount;
+
+    private boolean isCredit;
+
+    public TransactionSummaryDTO(Transaction transaction, Customer customer){
+        setTransactionId(transaction.getId());
+        if(customer != null){
+            setCredit((transaction.getToAccount() != null) && transaction.getToAccount().getCustomer().getId().equals(customer.getId()));
+        }
+        if(isCredit() && transaction.getFromAccount() != null) setOtherCustomer(transaction.getFromAccount().getCustomer().getName());
+        else if(!isCredit() && transaction.getToAccount() != null) setOtherCustomer(transaction.getToAccount().getCustomer().getName());
+        setDateOfTransaction(LocalDate.parse(transaction.getDateOfTransaction().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        setAmount(transaction.getAmount());
+    }
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public String getOtherCustomer() {
+        return otherCustomer;
+    }
+
+    public void setOtherCustomer(String otherCustomer) {
+        this.otherCustomer = otherCustomer;
+    }
+
+    public LocalDate getDateOfTransaction() {
+        return dateOfTransaction;
+    }
+
+    public void setDateOfTransaction(LocalDate dateOfTransaction) {
+        this.dateOfTransaction = dateOfTransaction;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public boolean isCredit() {
+        return isCredit;
+    }
+
+    public void setCredit(boolean credit) {
+        isCredit = credit;
+    }
+}

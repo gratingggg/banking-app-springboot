@@ -763,8 +763,6 @@ public class LoanTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(3))
-                .andExpect(jsonPath("$.content[0].transactionType").value(TransactionType.LOAN_REPAYMENT.toString()))
-                .andExpect(jsonPath("$.content[0].transactionStatus").value(TransactionStatus.SUCCESS.toString()))
                 .andExpect(jsonPath("$.page.totalElements").isNumber())
                 .andExpect(jsonPath("$.page.number").value(1))
                 .andExpect(jsonPath("$.page.size").value(3));
@@ -1360,8 +1358,6 @@ public class LoanTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
                 .andExpect(jsonPath("$.content.length()").value(3))
-                .andExpect(jsonPath("$.content[0].transactionType").value(TransactionType.LOAN_REPAYMENT.toString()))
-                .andExpect(jsonPath("$.content[0].transactionStatus").value(TransactionStatus.SUCCESS.toString()))
                 .andExpect(jsonPath("$.page.totalElements").isNumber())
                 .andExpect(jsonPath("$.page.number").value(1))
                 .andExpect(jsonPath("$.page.size").value(3));

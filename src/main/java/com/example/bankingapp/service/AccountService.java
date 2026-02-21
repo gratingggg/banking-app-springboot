@@ -5,6 +5,7 @@ import com.example.bankingapp.dto.account.AccountRequestDTO;
 import com.example.bankingapp.dto.account.AccountResponseDTO;
 import com.example.bankingapp.dto.account.AccountSummaryDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.dto.transaction.TransactionSummaryDTO;
 import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.customer.Customer;
@@ -110,8 +111,8 @@ public class AccountService {
         else throw new AccountNotActiveException();
     }
 
-    private Page<TransactionResponseDTO> getAllTransactions(Account account, int page, int size, TransactionStatus status,
-                                                            TransactionType type, LocalDate fromDate, LocalDate toDate){
+    private Page<TransactionSummaryDTO> getAllTransactions(Account account, int page, int size, TransactionStatus status,
+                                                           TransactionType type, LocalDate fromDate, LocalDate toDate){
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction"));
         Specification<Transaction> specification = TransactionSpecifications.forAccounts(account)
                 .and(TransactionSpecifications.withStatus(status))
@@ -119,7 +120,9 @@ public class AccountService {
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));;
         Page<Transaction> pageDto = transactionRepository.findAll(specification, pageable);
 
-        return pageDto.map(TransactionResponseDTO::new);
+        return pageDto.map(
+                transaction -> new TransactionSummaryDTO(transaction, account.getCustomer())
+        );
     }
 
     private AccountBalanceResponseDTO getBalance(Account account){
@@ -164,7 +167,7 @@ public class AccountService {
         return accountToAccountDTO(account);
     }
 
-    public Page<TransactionResponseDTO> getAllAccountTransactions(Long accountId, int page, int size, TransactionStatus status,
+    public Page<TransactionSummaryDTO> getAllAccountTransactions(Long accountId, int page, int size, TransactionStatus status,
                                                                   TransactionType type, LocalDate fromDate, LocalDate toDate, String customerUsername){
         Customer customer = customerRepository.findByUsername(customerUsername).orElseThrow(CustomerNotFoundException::new);
         Account account = accountRepository.findById(accountId)
@@ -260,7 +263,7 @@ public class AccountService {
         return accountToAccountDTO(account);
     }
 
-    public Page<TransactionResponseDTO> getAllAccountTransactionsByEmployee(Long accountId, int page, int size, TransactionStatus status,
+    public Page<TransactionSummaryDTO> getAllAccountTransactionsByEmployee(Long accountId, int page, int size, TransactionStatus status,
                                                                             TransactionType type, LocalDate fromDate, LocalDate toDate, String employeeUsername){
         validateEmployeeFromUsername(employeeUsername);
         Account account = accountRepository.findById(accountId).orElseThrow(AccountNotFoundException::new);
@@ -315,7 +318,12 @@ public class AccountService {
         if(!message.isBlank()){
             notificationService.createNotification(account.getCustomer(), NotificationType.TRANSACTION, message);
         }
-        return new TransactionResponseDTO(transaction);
+        TransactionResponseDTO dto = new TransactionResponseDTO(transaction, null);
+        dto.setSelf(account.getCustomer().getName());
+        dto.setAccountId(accountId);
+        dto.setCredit(true);
+
+        return dto;
     }
 
     @Transactional
@@ -363,6 +371,11 @@ public class AccountService {
             notificationService.createNotification(account.getCustomer(), NotificationType.TRANSACTION, message);
         }
 
-        return new TransactionResponseDTO(transaction);
+        TransactionResponseDTO dto = new TransactionResponseDTO(transaction, null);
+        dto.setSelf(account.getCustomer().getName());
+        dto.setAccountId(accountId);
+        dto.setCredit(false);
+
+        return dto;
     }
 }

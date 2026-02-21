@@ -4,6 +4,7 @@ import com.example.bankingapp.dto.loan.LoanRepaymentDTO;
 import com.example.bankingapp.dto.loan.LoanRequestDTO;
 import com.example.bankingapp.dto.loan.LoanResponseDTO;
 import com.example.bankingapp.dto.transaction.TransactionResponseDTO;
+import com.example.bankingapp.dto.transaction.TransactionSummaryDTO;
 import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.customer.Customer;
@@ -158,7 +159,7 @@ public class LoanService {
         loanRepository.save(loan);
         accountRepository.save(account);
 
-        return new TransactionResponseDTO(transaction);
+        return new TransactionResponseDTO(transaction, customer);
     }
 
     private Employee validateEmployee(String username){
@@ -207,7 +208,7 @@ public class LoanService {
         return new LoanResponseDTO(loan);
     }
 
-    public Page<TransactionResponseDTO> getLoanTransactions(Long loanId, int page, int size, TransactionStatus status,
+    public Page<TransactionSummaryDTO> getLoanTransactions(Long loanId, int page, int size, TransactionStatus status,
                                                             TransactionType type, LocalDate fromDate,
                                                             LocalDate toDate, String username){
         Loan loan = loanRepository.findById(loanId).orElseThrow(LoanNotFoundException::new);
@@ -218,7 +219,9 @@ public class LoanService {
                 .and(TransactionSpecifications.withType(type))
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));
         Page<Transaction> transactions = transactionRepostory.findAll(spec, pageable);
-        return transactions.map(TransactionResponseDTO::new);
+        return transactions.map(
+                transaction -> new TransactionSummaryDTO(transaction, loan.getAccount().getCustomer())
+        );
     }
 
     public LoanResponseDTO createLoanByEmployee(LoanRequestDTO requestDTO, Long accountId, String username){
@@ -244,9 +247,9 @@ public class LoanService {
         return new LoanResponseDTO(loan);
     }
 
-    public Page<TransactionResponseDTO> getLoanTransactionsByEmployee(Long loanId, int page, int size, TransactionStatus status,
-                                                            TransactionType type, LocalDate fromDate,
-                                                            LocalDate toDate, String username){
+    public Page<TransactionSummaryDTO> getLoanTransactionsByEmployee(Long loanId, int page, int size, TransactionStatus status,
+                                                                     TransactionType type, LocalDate fromDate,
+                                                                     LocalDate toDate, String username){
         validateEmployee(username);
         Loan loan = loanRepository.findById(loanId).orElseThrow(LoanNotFoundException::new);
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateOfTransaction"));
@@ -255,7 +258,9 @@ public class LoanService {
                 .and(TransactionSpecifications.withType(type))
                 .and(TransactionSpecifications.dateBetween(fromDate, toDate));
         Page<Transaction> transactions = transactionRepostory.findAll(spec, pageable);
-        return transactions.map(TransactionResponseDTO::new);
+        return transactions.map(
+                transaction -> new TransactionSummaryDTO(transaction, loan.getAccount().getCustomer())
+        );
     }
 
     public Page<LoanResponseDTO> getAllLoans(int page, int size, LoanStatus status, LoanType type,

@@ -130,7 +130,7 @@ public class Transaction extends BaseEntity {
         if(getTransactionType() == TransactionType.DEPOSIT ||
                 getTransactionType() == TransactionType.INTEREST ||
                 getTransactionType() == TransactionType.LOAN_DISBURSEMENT){
-            return this.getTransactionStatus() == TransactionStatus.SUCCESS;
+            return (getTransactionStatus() == TransactionStatus.SUCCESS);
         }
         return false;
     }

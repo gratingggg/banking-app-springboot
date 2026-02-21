@@ -152,7 +152,12 @@ public class EmployeeService {
         loan.setDateOfIssuance(LocalDate.now());
         loanRepository.save(loan);
 
-        return new TransactionResponseDTO(transaction);
+        TransactionResponseDTO dto = new TransactionResponseDTO(transaction, null);
+        dto.setSelf(account.getCustomer().getName());
+        dto.setAccountId(account.getId());
+        dto.setCredit(true);
+
+        return dto;
     }
 
 }

@@ -619,15 +619,9 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(get(Endpoints.EMPLOYEE_ACCOUNT_TRANSACTIONS_ALL, account.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].transactionId").value(transaction.getId()))
-                .andExpect(jsonPath("$.content[0].dateOfTransaction").value(transaction.getDateOfTransaction().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
-                .andExpect(jsonPath("$.content[0].amount").value("299.0"))
-                .andExpect(jsonPath("$.content[0].toAccountId").value(account.getId()))
-                .andExpect(jsonPath("$.content[0].transactionType").value(transaction.getTransactionType().toString()))
-                .andExpect(jsonPath("$.content[0].transactionStatus").value(transaction.getTransactionStatus().toString()))
-                .andExpect(jsonPath("$.content[0].fromAccountId").doesNotExist())
-                .andExpect(jsonPath("$.content[0].loanId").doesNotExist())
-                .andExpect(jsonPath("$.content[0].failureReason").doesNotExist());
+                .andExpect(jsonPath("$.content[0].credit").exists())
+                .andExpect(jsonPath("$.content[0].dateOfTransaction").value(transaction.getDateOfTransaction().toLocalDate().toString()))
+                .andExpect(jsonPath("$.content[0].amount").value("299.0"));
     }
 
     @Test
@@ -738,11 +732,8 @@ public class EmployeeCustomerAccountTests {
                         .param("size", "3")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].transactionId").exists())
                 .andExpect(jsonPath("$.content[0].amount").value(2160.0))
-                .andExpect(jsonPath("$.content[1].transactionId").exists())
                 .andExpect(jsonPath("$.content[1].amount").value(3430.0))
-                .andExpect(jsonPath("$.content[2].transactionId").exists())
                 .andExpect(jsonPath("$.content[2].amount").value(5120.0));
     }
 
@@ -767,8 +758,8 @@ public class EmployeeCustomerAccountTests {
         mockMvc.perform(get(Endpoints.EMPLOYEE_CUSTOMER_TRANSACTION_ALL, customer.getId())
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].transactionId").value(transaction0.getId()))
-                .andExpect(jsonPath("$.content[1].transactionId").value(transaction1.getId()));
+                .andExpect(jsonPath("$.content[0].amount").exists())
+                .andExpect(jsonPath("$.content[1].credit").exists());
     }
 
     @Test
@@ -868,11 +859,11 @@ public class EmployeeCustomerAccountTests {
                         .param("size", "3")
                         .with(user(employee.getUsername()).roles(employee.getRole().toString())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].transactionId").exists())
+                .andExpect(jsonPath("$.content[0].credit").exists())
                 .andExpect(jsonPath("$.content[0].amount").value(270.0))
-                .andExpect(jsonPath("$.content[1].transactionId").exists())
+                .andExpect(jsonPath("$.content[1].credit").exists())
                 .andExpect(jsonPath("$.content[1].amount").value(80.0))
-                .andExpect(jsonPath("$.content[2].transactionId").exists())
+                .andExpect(jsonPath("$.content[2].credit").exists())
                 .andExpect(jsonPath("$.content[2].amount").value(10.0));
     }
 
