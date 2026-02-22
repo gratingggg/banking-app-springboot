@@ -5,7 +5,6 @@ import com.example.bankingapp.entities.transaction.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class TransactionSummaryDTO {
     private Long transactionId;
@@ -25,7 +24,7 @@ public class TransactionSummaryDTO {
         }
         if(isCredit() && transaction.getFromAccount() != null) setOtherCustomer(transaction.getFromAccount().getCustomer().getName());
         else if(!isCredit() && transaction.getToAccount() != null) setOtherCustomer(transaction.getToAccount().getCustomer().getName());
-        setDateOfTransaction(LocalDate.parse(transaction.getDateOfTransaction().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        setDateOfTransaction(transaction.getDateOfTransaction().toLocalDate());
         setAmount(transaction.getAmount());
     }
 

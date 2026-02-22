@@ -4,13 +4,14 @@ import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.transaction.Transaction;
 import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
+import com.example.bankingapp.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class TransactionResponseDTO {
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    @JsonFormat(pattern = Constants.LocalDateTimePattern)
     private LocalDateTime dateOfTransaction;
 
     private BigDecimal amount;

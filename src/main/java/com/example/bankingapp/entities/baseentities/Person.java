@@ -1,5 +1,6 @@
 package com.example.bankingapp.entities.baseentities;
 
+import com.example.bankingapp.utils.Constants;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.Email;
@@ -28,7 +29,7 @@ public class Person extends BaseEntity {
 
     @Column(name = "date_of_birth")
     @NotNull(message = "Date of birth cannot be null")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = Constants.LocalDatePattern)
     private LocalDate dateOfBirth;
 
     @Column(name = "address")

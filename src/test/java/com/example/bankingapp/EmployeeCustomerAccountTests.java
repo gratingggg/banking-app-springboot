@@ -18,6 +18,7 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Constants;
 import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -899,7 +900,7 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.toAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.fromAccountId").doesNotExist())
-                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
+                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.LocalDateTimePattern))))
                 .andExpect(jsonPath("$.transactionType").value(TransactionType.DEPOSIT.toString()))
                 .andExpect(jsonPath("$.transactionStatus").value(TransactionStatus.SUCCESS.toString()));
 
@@ -1075,7 +1076,7 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.amount").value(2000))
                 .andExpect(jsonPath("$.fromAccountId").value(account.getId()))
                 .andExpect(jsonPath("$.toAccountId").doesNotExist())
-                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
+                .andExpect(jsonPath("$.dateOfTransaction").value(LocalDateTime.now().format(DateTimeFormatter.ofPattern(Constants.LocalDateTimePattern))))
                 .andExpect(jsonPath("$.transactionType").value(TransactionType.WITHDRAWAL.toString()))
                 .andExpect(jsonPath("$.transactionStatus").value(TransactionStatus.SUCCESS.toString()));
 

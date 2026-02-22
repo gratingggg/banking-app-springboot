@@ -83,7 +83,7 @@ public class CustomerRegisterControllerTest {
                 jsonPath("$.email").value("ru" + i + "dra@example.com"),
                 jsonPath("$.gender").value("MALE"),
                 jsonPath("$.address").value("Mars" + i),
-                jsonPath("$.dateOfBirth").value("01-01-" + (2000 + num)),
+                jsonPath("$.dateOfBirth").value("01/01/" + (2000 + num)),
                 jsonPath("$.phoneNumber").value("1234123" + i)
         };
     }

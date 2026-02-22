@@ -4,6 +4,7 @@ import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.loan.Loan;
+import com.example.bankingapp.utils.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class Transaction extends BaseEntity {
     @Column(name = "date", nullable = false)
     @NotNull(message = "Date of transaction cannot be null")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = Constants.LocalDateTimePattern)
     private LocalDateTime dateOfTransaction;
 
     @Column(name = "amount", nullable = false)

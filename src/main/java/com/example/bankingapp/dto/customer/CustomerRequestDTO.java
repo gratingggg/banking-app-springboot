@@ -1,6 +1,7 @@
 package com.example.bankingapp.dto.customer;
 
 import com.example.bankingapp.entities.baseentities.PersonGender;
+import com.example.bankingapp.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 
@@ -18,7 +19,7 @@ public class CustomerRequestDTO {
     private String phoneNumber;
 
     @NotNull(message = "Date of birth cannot be null.")
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = Constants.LocalDatePattern)
     @Past(message = "Invalid date. Please enter a valid date.")
     private LocalDate dateOfBirth;
 

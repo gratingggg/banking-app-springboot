@@ -1,6 +1,7 @@
 package com.example.bankingapp.dto.customer;
 
 import com.example.bankingapp.entities.baseentities.PersonGender;
+import com.example.bankingapp.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -16,7 +17,7 @@ public class CustomerResponseDTO {
     @Pattern(regexp = "^\\d{10}$", message = "Invalid phone number")
     private String phoneNumber;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = Constants.LocalDatePattern)
     private LocalDate dateOfBirth;
 
     private String address;
