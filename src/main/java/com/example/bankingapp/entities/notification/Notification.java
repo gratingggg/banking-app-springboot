@@ -2,6 +2,7 @@ package com.example.bankingapp.entities.notification;
 
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.customer.Customer;
+import com.example.bankingapp.utils.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ public class Notification extends BaseEntity {
 
     @Column(name = "date")
     @NotNull(message = "Date cannot be null")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = Constants.LocalDateTimePattern)
     private LocalDateTime date;
 
     @Column(name = "status")

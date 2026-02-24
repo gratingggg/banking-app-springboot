@@ -60,7 +60,6 @@ public class AccountService {
         responseDTO.setAccountId(account.getId());
         responseDTO.setAccountType(account.getAccountType());
         responseDTO.setAccountStatus(account.getAccountStatus());
-        responseDTO.setBalance(account.getBalance());
         responseDTO.setCustomerName(account.getCustomer().getName());
         responseDTO.setDateOfIssuance(account.getDateOfIssuance());
         return responseDTO;
@@ -127,9 +126,7 @@ public class AccountService {
 
     private AccountBalanceResponseDTO getBalance(Account account){
         if(account.getAccountStatus().equals(AccountStatus.ACTIVE)){
-            AccountBalanceResponseDTO responseDTO = new AccountBalanceResponseDTO();
-            responseDTO.setBalance(account.getBalance());
-            return responseDTO;
+            return new AccountBalanceResponseDTO(account);
         }
         throw new AccountNotActiveException();
     }

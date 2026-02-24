@@ -18,6 +18,7 @@ import com.example.bankingapp.entities.transaction.TransactionStatus;
 import com.example.bankingapp.entities.transaction.TransactionType;
 import com.example.bankingapp.repository.*;
 import com.example.bankingapp.specification.NotificationSpecifications;
+import com.example.bankingapp.utils.Constants;
 import com.example.bankingapp.utils.Endpoints;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -197,8 +198,7 @@ public class CustomerAccountTests {
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
                 .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
                 .andExpect(jsonPath("$.accountStatus").value(account.getAccountStatus().toString()))
-                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-                .andExpect(jsonPath("$.balance").value(0.0))
+                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern(Constants.LocalDatePattern))))
                 .andExpect(jsonPath("$.customerName").value(customer.getName()));
     }
 
@@ -465,8 +465,7 @@ public class CustomerAccountTests {
                 .andExpect(jsonPath("$.accountId").exists())
                 .andExpect(jsonPath("$.customerName").value(customer.getName()))
                 .andExpect(jsonPath("$.accountType").value(requestDTO.getAccountType().toString()))
-                .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
-                .andExpect(jsonPath("$.balance").value("0"))
+                .andExpect(jsonPath("$.dateOfIssuance").value(LocalDate.now().format(DateTimeFormatter.ofPattern(Constants.LocalDatePattern))))
                 .andExpect(jsonPath("$.accountStatus").value("ACTIVE"));
 
         Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);

@@ -2,9 +2,9 @@ package com.example.bankingapp.dto.account;
 
 import com.example.bankingapp.entities.account.AccountStatus;
 import com.example.bankingapp.entities.account.AccountType;
+import com.example.bankingapp.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class AccountResponseDTO {
@@ -14,9 +14,7 @@ public class AccountResponseDTO {
 
     private AccountStatus accountStatus;
 
-    private BigDecimal balance ;
-
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    @JsonFormat(pattern = Constants.LocalDatePattern)
     private LocalDate dateOfIssuance;
 
     private String customerName;
@@ -43,14 +41,6 @@ public class AccountResponseDTO {
 
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
     }
 
     public LocalDate getDateOfIssuance() {

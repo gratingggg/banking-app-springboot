@@ -2,6 +2,7 @@ package com.example.bankingapp.dto.transaction;
 
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.transaction.Transaction;
+import com.example.bankingapp.entities.transaction.TransactionStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ public class TransactionSummaryDTO {
 
     private boolean isCredit;
 
+    private boolean success;
+
     public TransactionSummaryDTO(Transaction transaction, Customer customer){
         setTransactionId(transaction.getId());
         if(customer != null){
@@ -26,6 +29,7 @@ public class TransactionSummaryDTO {
         else if(!isCredit() && transaction.getToAccount() != null) setOtherCustomer(transaction.getToAccount().getCustomer().getName());
         setDateOfTransaction(transaction.getDateOfTransaction().toLocalDate());
         setAmount(transaction.getAmount());
+        setSuccess(transaction.getTransactionStatus().equals(TransactionStatus.SUCCESS));
     }
 
     public Long getTransactionId() {
@@ -66,5 +70,13 @@ public class TransactionSummaryDTO {
 
     public void setCredit(boolean credit) {
         isCredit = credit;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }

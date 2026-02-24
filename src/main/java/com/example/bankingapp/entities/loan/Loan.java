@@ -4,6 +4,7 @@ import com.example.bankingapp.entities.account.Account;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.employee.Employee;
 import com.example.bankingapp.entities.transaction.Transaction;
+import com.example.bankingapp.utils.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
@@ -25,7 +26,7 @@ public class Loan extends BaseEntity {
     private Account account;
 
     @Column(name = "issuance_date")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = Constants.LocalDatePattern)
     private LocalDate dateOfIssuance;
 
     @Column(name = "tenure", nullable = false)

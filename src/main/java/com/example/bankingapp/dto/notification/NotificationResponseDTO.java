@@ -2,6 +2,7 @@ package com.example.bankingapp.dto.notification;
 
 import com.example.bankingapp.entities.notification.NotificationStatus;
 import com.example.bankingapp.entities.notification.NotificationType;
+import com.example.bankingapp.utils.Constants;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ public class NotificationResponseDTO {
 
     private String message;
 
-    @JsonFormat(pattern = "dd-MM-yyyy hh:MM:ss")
+    @JsonFormat(pattern = Constants.LocalDateTimePattern)
     private LocalDateTime date;
 
     private NotificationStatus notificationStatus;

@@ -3,6 +3,7 @@ package com.example.bankingapp.entities.account;
 import com.example.bankingapp.entities.baseentities.BaseEntity;
 import com.example.bankingapp.entities.customer.Customer;
 import com.example.bankingapp.entities.loan.Loan;
+import com.example.bankingapp.utils.Constants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.core.style.ToStringCreator;
@@ -32,7 +33,7 @@ public class Account extends BaseEntity {
 
     @Column(name = "date", nullable = false)
     @NotNull(message = "Date of issuance cannot be null")
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = Constants.LocalDatePattern)
     private LocalDate dateOfIssuance;
 
     @ManyToOne(fetch = FetchType.LAZY)

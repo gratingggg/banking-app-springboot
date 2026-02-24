@@ -243,9 +243,8 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
                 .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
                 .andExpect(jsonPath("$.accountStatus").value(account.getAccountStatus().toString()))
-                .andExpect(jsonPath("$.balance").value(0.0))
                 .andExpect(jsonPath("$.customerName").value(account.getCustomer().getName()))
-                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern(Constants.LocalDatePattern))));
     }
 
     @Test
@@ -454,9 +453,8 @@ public class EmployeeCustomerAccountTests {
                 .andExpect(jsonPath("$.accountId").value(account.getId()))
                 .andExpect(jsonPath("$.accountType").value(account.getAccountType().toString()))
                 .andExpect(jsonPath("$.accountStatus").value("CLOSED"))
-                .andExpect(jsonPath("$.balance").value(0.0))
                 .andExpect(jsonPath("$.customerName").value(account.getCustomer().getName()))
-                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))));
+                .andExpect(jsonPath("$.dateOfIssuance").value(account.getDateOfIssuance().format(DateTimeFormatter.ofPattern(Constants.LocalDatePattern))));
 
         Specification<Notification> specs = NotificationSpecifications.forCustomer(customer);
         assertEquals(1, notificationRepository.findAll(specs).size());
