@@ -17,6 +17,7 @@ import com.example.bankingapp.repository.CustomerRepository;
 import com.example.bankingapp.repository.EmployeeRepository;
 import com.example.bankingapp.repository.TransactionRepository;
 import com.example.bankingapp.specification.TransactionSpecifications;
+import com.example.bankingapp.utils.Constants;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -127,11 +129,11 @@ public class TransactionService {
 
             fromMessage = "Dear " + fromAccount.getCustomer().getName() +
                     ", " + amount + " has been debited from your account A/C " + fromAccount.getId() +
-                    " on " + transaction.getDateOfTransaction() + " towards " +
+                    " on " + transaction.getDateOfTransaction().format(DateTimeFormatter.ofPattern(Constants.LocalDateTimePattern)) + " towards " +
                     toAccount.getCustomer().getName() + ".";
             toMessage = "Dear " + toAccount.getCustomer().getName() +
                     ", " + amount + " has been credited to your account A/C " + toAccount.getId() +
-                    " on " + transaction.getDateOfTransaction() + " from " +
+                    " on " + transaction.getDateOfTransaction().format(DateTimeFormatter.ofPattern(Constants.LocalDateTimePattern)) + " from " +
                     fromAccount.getCustomer().getName() + ".";
         }
 
